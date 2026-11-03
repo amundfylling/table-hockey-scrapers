@@ -1,0 +1,84 @@
+name: Nightly Scrape
+
+on:
+  schedule:
+    # 04:00 UTC every night
+    - cron: '0 4 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape-and-update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest -q
+
+      # One step per source: a failing source is marked, the others still run.
+      - name: stiga.trefik.cz
+        id: trefik
+        continue-on-error: true
+        run: python -m scrapers.trefik
+
+      - name: galdahokejs.lv
+        id: galdahokejs
+        continue-on-error: true
+        run: python -m scrapers.galdahokejs
+
+      - name: escore.live
+        id: escore
+        continue-on-error: true
+        run: python -m scrapers.escore
+
+      - name: tulos.poytajaakiekko.fi
+        id: finland
+        continue-on-error: true
+        run: python -m scrapers.finland
+
+      - name: Combine and cross-source duplicate check
+        if: always()
+        run: python -m scrapers.all --combine-only
+
+      - name: Commit and push changes
+        # Also runs when a step failed, so the raw responses fetched so far are kept.
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "chore: nightly data update"
+            for attempt in 1 2 3; do
+              git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && break
+              sleep 10
+              [ "$attempt" = 3 ] && exit 1
+            done
+          fi
+
+      - name: Fail the run if a source failed
+        if: steps.trefik.outcome == 'failure' || steps.galdahokejs.outcome == 'failure' || steps.escore.outcome == 'failure' || steps.finland.outcome == 'failure'
+        run: |
+          echo "trefik=${{ steps.trefik.outcome }} galdahokejs=${{ steps.galdahokejs.outcome }} escore=${{ steps.escore.outcome }} finland=${{ steps.finland.outcome }}"
+          exit 1

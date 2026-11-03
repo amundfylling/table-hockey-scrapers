@@ -1,0 +1,7 @@
+Rank	ID_Player	Player	Club	Nation	Points	Player_Value
+1	200042	Edgars Caics	Riga	LAT	9999	100
+2	70418	Petr Tmej	Turnov	CZE	9000	99
+3	70432	Ladislav Tmej	Turnov	CZE	8900	98
+4	123001	Pavel Plesak	Praha	CZE	5000	50
+5	123002	Pavel Plesak	Bratislava	SVK	4000	40
+6	123003	Rainers Kalnins	Incukalns	LAT	3000	30

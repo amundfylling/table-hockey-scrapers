@@ -1,0 +1,17 @@
+"""Scraper for stiga.trefik.cz. See README.md."""
+
+from __future__ import annotations
+
+import pandas as pd
+
+from ..common.context import RunContext
+
+SOURCE = "stiga.trefik.cz"
+OUTPUT = "trefik_results.parquet"
+
+
+def run(ctx: RunContext) -> pd.DataFrame:
+    """Crawl (unless offline), transform the raw cache and write data/trefik_results.parquet."""
+    raise NotImplementedError(
+        "trefik: crawler/parser not written yet. The build environment could not reach stiga.trefik.cz, and the "
+        "parser must be written and tested against real pages saved from the site.")
