@@ -1,7 +1,16 @@
+Table hockey ranking up to 27.10.2026
 Rank	ID_Player	Player	Club	Nation	Points	Player_Value
-1	200042	Edgars Caics	Riga	LAT	9999	100
-2	70418	Petr Tmej	Turnov	CZE	9000	99
-3	70432	Ladislav Tmej	Turnov	CZE	8900	98
-4	123001	Pavel Plesak	Praha	CZE	5000	50
-5	123002	Pavel Plesak	Bratislava	SVK	4000	40
-6	123003	Rainers Kalnins	Incukalns	LAT	3000	30
+1	655257	Rainers Kalnins	Incukalns THC	LAT	4701	1010
+3	200042	Edgars Caics	BJC Laimite	LAT	4561	965
+30	660648	Magnus Klippen	Brent Plast BHK	NOR	3859	895
+32	70181	Michal Hvizd	THC Stiga Elites	CZE	3831	830
+63	200244	Mikus Saulitis	Incukalns THC	LAT	3377	710
+121	70001	Pavel Plesak	Gladiators Plzen	CZE	2922	735
+141	660637	Oystein Klippen	Brent Plast BHK	NOR	2812	625
+233	70026	Milos Sevr	THC Stiga Elites	CZE	2335	551
+352	70182	Leos Hvizd ml.	SHC Cheb	CZE	1895	757
+422	662492	Egor Stepanov	Novosibirsk	RUS	1698	500
+3318	677965	Filip Zlamal	???	CZE	28	28
+4805	677403	Filip Zlamal	???	CZE	10	10
+6077	672767	Egor Stepanov	???	EST	4	16
+6881	674265	Egor Stepanov	???	RUS	1	2

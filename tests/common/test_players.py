@@ -7,8 +7,7 @@ FIX = Path(__file__).parent / "fixtures"
 
 def ref():
     # players_data_sample.csv is a real excerpt of Sportscorpion's players_data.csv.
-    # ranking_sample.txt follows ranking.txt's documented layout (it could not be downloaded when the test was
-    # written); replace it with a real excerpt once stiga.trefik.cz is reachable.
+    # ranking_sample.txt is a real excerpt of stiga.trefik.cz/ithf/ranking/ranking.txt (27.10.2026).
     return load_reference(str(FIX / "players_data_sample.csv"), str(FIX / "ranking_sample.txt"))
 
 
@@ -32,12 +31,15 @@ def test_ithf_to_sportscorpion_and_synthetic():
 
 def test_ranking_name_match_is_unique_and_nation_aware():
     m = PlayerMapper(ref(), "test")
-    assert m.match_ranking("Tmej Petr", nation="CZE") == 70418
-    assert m.match_ranking("Kalniņš Rainers", nation="LVA") == 123003  # ISO code accepted
-    assert m.match_ranking("Plešák Pavel") is None  # two players, no nation -> ambiguous
-    assert m.match_ranking("Plešák Pavel", prefer_nation="CZE") == 123001
-    assert m.match_ranking("Plešák Pavel", nation="SVK") == 123002
-    assert m.match_ranking("Tmej Petr", nation="LAT") is None
+    assert m.match_ranking("Plešák Pavel", nation="CZE") == 70001
+    assert m.match_ranking("Kalniņš Rainers", nation="LVA") == 655257  # ISO code accepted
+    # Egor Stepanov: two RUS players and one EST player in the real ranking
+    assert m.match_ranking("Stepanov Egor") is None  # three players, no nation -> ambiguous
+    assert m.match_ranking("Stepanov Egor", prefer_nation="EST") == 672767
+    assert m.match_ranking("Stepanov Egor", nation="EST") == 672767
+    assert m.match_ranking("Stepanov Egor", nation="RUS") is None  # still two
+    assert m.match_ranking("Zlámal Filip", nation="CZE") is None  # two CZE players with this name
+    assert m.match_ranking("Plešák Pavel", nation="LAT") is None
 
 
 def test_sportscorpion_name_match_with_country(tmp_path):
