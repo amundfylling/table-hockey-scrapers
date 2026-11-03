@@ -24,7 +24,7 @@ Parquet file per source in exactly the schema of
 | `trefik` | done: 360 events 2000–2026, ~302k games (see "stiga.trefik.cz" below) |
 | `galdahokejs` | **not written yet**: galdahokejs.lv blocked (needs the shared Trefik SW parser from `trefik`) |
 | `escore` | **not written yet**: escore.live blocked |
-| `finland` | **not written yet**: tulos.poytajaakiekko.fi blocked; access question still open (below) |
+| `finland` | event index only; results need an API key; access email drafted (see below) |
 
 Parsers are only written against real pages saved from each site (they become the test fixtures), so the
 source modules currently raise `NotImplementedError`. The workflow step for each source fails until then,
@@ -115,13 +115,20 @@ exponential backoff, User-Agent `table-hockey-h2h-scraper/1.0 (+https://github.c
 robots.txt is respected (an HTML "robots.txt", like Finland's 404 page, counts as no rules). No login, admin or
 write endpoints; a 401/403 raises `AccessDenied` and is never worked around.
 
-## Findings so far
+## tulos.poytajaakiekko.fi (Finland) – waiting for access
 
-- **Finland:** the `spjass` GitHub account only has old public repos (`TH-Results`, `THResults`, a 2013/2015
-  Android result app); the source or a data export of tulos.poytajaakiekko.fi is not public there.
-  `/api/tournaments/<id>` answered `{"error":"Invalid API access"}` to an anonymous GET in an earlier probe; it
-  still has to be checked how the public result pages load their data before deciding whether access must be
-  requested.
+- **Public:** `/api/events?limit=500` (all 217 events with their sub-tournaments: Open, Veterans, Juniors, Women,
+  side tournaments), `/api/events/<slug>` and `/api/players/search?q=` (with `worldRankingID` = ITHF id).
+- **Not public:** the results. The site's pages load them from `/api/tournaments/<slug>` with an internal API key
+  sent by their JavaScript; without it the endpoint answers `401 {"error":"Invalid API access"}`. Sending that key
+  from a scraper would be getting around the access check, so the module does not.
+- **What runs now:** `python -m scrapers.finland` fetches the event index, gives every finished sub-tournament its
+  permanent TournamentID (`data/finland/tournament_ids.csv`, keyed by the site's tournament id; name = event name +
+  type when not Open, e.g. `215. Tampere – Veterans`), and probes one results URL so the log shows when access
+  starts working. No Parquet is written yet. Player ids: `worldRankingID` → ITHF/Sportscorpion as everywhere,
+  else 30_000_000+ keyed by the site's player id (`player_id()`).
+- **Access request:** draft in `docs/finland_access_email.md`. The old `spjass` GitHub repos (`TH-Results`,
+  `THResults`) don't contain the site's data.
 
 ## stiga.trefik.cz
 
