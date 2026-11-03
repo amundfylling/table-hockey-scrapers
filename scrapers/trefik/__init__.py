@@ -60,6 +60,7 @@ class PlayerRef:
     idpl: int | None = None
     ithf: int | None = None
     nation: str | None = None
+    club: str | None = None
 
 
 @dataclass
@@ -158,7 +159,13 @@ def _parse_one(fetcher: Fetcher, item: Listed, key: str, category: str | None, u
         return None
     named = Listed(item.key, item.url, item.season, item.label, item.row_label, item.index_date, category, item.kind)
     parsed = Parsed(key, tournament_name(named, ev.title, when), when.isoformat(), url)
+    return assemble(parsed, pages, skips)
 
+
+def assemble(parsed: Parsed, pages: dict[str, str], skips: SkipCounter) -> Parsed:
+    """Read players, cross-tables and play-off series from every result page of one event (any Trefik SW
+    export: stiga.trefik.cz or galdahokejs.lv). Group games are added later by ``resolve_groups``."""
+    key = parsed.key
     groups: list[tuple[str, sw.Group]] = []
     seen_groups: set[tuple] = set()
     series_all: list[tuple[str, sw.Series]] = []
@@ -169,6 +176,7 @@ def _parse_one(fetcher: Fetcher, item: Listed, key: str, category: str | None, u
             ref = parsed.players.setdefault(row.name, PlayerRef(row.name))
             ref.idpl = ref.idpl or row.idpl
             ref.nation = ref.nation or NATION_CODES.get((row.nation or "").lower())
+            ref.club = ref.club or (row.club if row.club and not row.nation else None)
         for idpl, ithf, name in sw.parse_participants(page):
             ref = next((p for p in parsed.players.values() if idpl and p.idpl == idpl), None) \
                 or parsed.players.get(sw.clean_name(name))
@@ -217,9 +225,11 @@ def _parse_one(fetcher: Fetcher, item: Listed, key: str, category: str | None, u
     return parsed
 
 
-def resolve_groups(parsed: Parsed, pool: dict[int, list[str]], skips: SkipCounter) -> None:
+def resolve_groups(parsed: Parsed, pool: dict[int, list[str]], skips: SkipCounter,
+                   reference: list[str] | None = None) -> None:
     """Turn the cross-tables into games, resolving short labels to full names. Candidates are the event's own
-    names first, then (for pages without any full-name list) every name seen on the site in nearby seasons."""
+    names first, then (for pages without any full-name list) every name seen on the site in nearby seasons, then
+    the optional `reference` names (e.g. a nation's players in ranking.txt, as 'Surname First')."""
     local = _unique_names(parsed.players)
     year = int(parsed.date[:4])
     groups = [g for _, g in parsed.pending_groups]
@@ -227,6 +237,8 @@ def resolve_groups(parsed: Parsed, pool: dict[int, list[str]], skips: SkipCounte
     if any(not r.full for g in groups for r in g.rows):
         fallback = _unique_names(n for y in range(year - 3, year + 4) for n in pool.get(y, []))
         sw.resolve_all_groups(groups, fallback)
+    if reference and any(not r.full for g in groups for r in g.rows):
+        sw.resolve_all_groups(groups, _unique_names(reference))
     for url, g in parsed.pending_groups:
         for row in g.rows:
             if row.full:
@@ -247,7 +259,7 @@ def _unique_names(names) -> list[str]:
 def _group_games(parsed: Parsed, g: sw.Group, url: str, skips: SkipCounter) -> None:
     rounds = sw.round_lookup(g)
     stage = (("Basic groups " if g.phase == "basic" else "Final groups ") + g.name).strip()
-    seq = 1 if g.phase == "basic" else 2
+    seq = (1 if g.phase == "basic" else 2) + getattr(g, "seq_offset", 0)
     for i, row in enumerate(g.rows):
         for j in range(i + 1, len(g.rows)):
             cell = row.cells[j] if j < len(row.cells) else ""
