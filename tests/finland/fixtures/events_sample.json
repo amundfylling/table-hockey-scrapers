@@ -1,0 +1,109 @@
+{
+ "events": [
+  {
+   "id": "cmu6gr2gi3emncb9xp5tl10nj",
+   "name": "215. Tampere",
+   "startDate": "2026-10-17T00:00:00.000Z",
+   "endDate": null,
+   "location": "Tampere",
+   "eventNumber": 215,
+   "ranked": true,
+   "status": "FINISHED",
+   "eventType": "NATIONAL",
+   "slug": "215-tampere",
+   "enablePreRegistration": true,
+   "tournaments": [
+    {
+     "id": "cmu6grtu73emocb9xlxz8ioby",
+     "name": "215. Tampere",
+     "startDate": "2026-10-17T00:00:00.000Z",
+     "endDate": null,
+     "tournamentType": "OPEN",
+     "tournamentLevel": [
+      "RANKING_TOURNAMENT"
+     ],
+     "tournamentStatus": "FINISHED",
+     "customType": null,
+     "slug": "2026-10-17-open"
+    },
+    {
+     "id": "cmu6gsfqt3emrcb9x2p1cj2hf",
+     "name": "215. Tampere",
+     "startDate": "2026-10-17T09:00:00.000Z",
+     "endDate": null,
+     "tournamentType": "JUNIORS",
+     "tournamentLevel": [
+      "RANKING_TOURNAMENT"
+     ],
+     "tournamentStatus": "FINISHED",
+     "customType": null,
+     "slug": "2026-10-17-juniors"
+    },
+    {
+     "id": "cmvbcgd11002ut120bw9b6cpr",
+     "name": "Haastajasarja",
+     "startDate": "2026-10-17T09:00:00.000Z",
+     "endDate": "2026-10-17T09:00:00.000Z",
+     "tournamentType": "CUSTOM",
+     "tournamentLevel": [
+      "CASUAL"
+     ],
+     "tournamentStatus": "FINISHED",
+     "customType": null,
+     "slug": "2026-10-17-custom"
+    },
+    {
+     "id": "cmvclmnxb3g3cpk87b74uvgp1",
+     "name": "215. Tampere",
+     "startDate": "2026-10-17T00:00:00.000Z",
+     "endDate": null,
+     "tournamentType": "VETERANS",
+     "tournamentLevel": [
+      "RANKING_TOURNAMENT"
+     ],
+     "tournamentStatus": "FINISHED",
+     "customType": null,
+     "slug": "2026-10-17-veterans"
+    }
+   ],
+   "season": {
+    "id": "cmt7d2mlm0ktvptja6tcqz3o4",
+    "name": "2026-2027",
+    "slug": "2026-2027"
+   },
+   "league": {
+    "id": "finnish-ranking-tournaments",
+    "name": "Finnish Ranking Tournaments",
+    "slug": "finnish-ranking-tournaments"
+   },
+   "eventInfo": null,
+   "hasEventInfo": false
+  },
+  {
+   "id": "cmus71skv3k65cb9xwrud9cp8",
+   "name": "Helsinki Open 2027",
+   "startDate": "2027-03-13T00:00:00.000Z",
+   "endDate": null,
+   "location": "Helsinki",
+   "eventNumber": 218,
+   "ranked": true,
+   "status": "SCHEDULED",
+   "eventType": "WTHT",
+   "slug": "218-helsinki",
+   "enablePreRegistration": true,
+   "tournaments": [],
+   "season": {
+    "id": "cmt7d2mlm0ktvptja6tcqz3o4",
+    "name": "2026-2027",
+    "slug": "2026-2027"
+   },
+   "league": {
+    "id": "finnish-ranking-tournaments",
+    "name": "Finnish Ranking Tournaments",
+    "slug": "finnish-ranking-tournaments"
+   },
+   "eventInfo": null,
+   "hasEventInfo": false
+  }
+ ]
+}

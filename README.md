@@ -21,14 +21,14 @@ Parquet file per source in exactly the schema of
 |---|---|
 | Shared layer (`scrapers/common/`): HTTP client, id mapper, registries, schema writer, duplicate check | done, tested |
 | `python -m scrapers.all`, nightly workflow | done |
-| `trefik` | **not written yet**: the build environment's network policy blocked stiga.trefik.cz |
-| `galdahokejs` | **not written yet**: galdahokejs.lv blocked (needs the shared Trefik SW parser from `trefik`) |
-| `escore` | **not written yet**: escore.live blocked |
-| `finland` | **not written yet**: tulos.poytajaakiekko.fi blocked; access question still open (below) |
+| `trefik` | done: 360 events 2000–2026, ~302k games (see "stiga.trefik.cz" below) |
+| `galdahokejs` | done: 44 events 2023-09 – 2025-11, ~32.6k games (see "galdahokejs.lv" below) |
+| `escore` | done: 28 events 2026-01 – 2026-09, ~12.4k games (see "escore.live" below) |
+| `finland` | event index only; results need an API key; access email drafted (see below) |
 
-Parsers are only written against real pages saved from each site (they become the test fixtures), so the
-source modules currently raise `NotImplementedError`. The workflow step for each source fails until then,
-while the others (and the combine step) still run.
+Parsers are written against real pages saved from each site (kept as test fixtures under `tests/<source>/`).
+The first combined run gave 347k games in `all_results.parquet` and no suspicious cross-source pairs in
+`duplicate_check.csv`.
 
 ## Usage
 
@@ -115,18 +115,90 @@ exponential backoff, User-Agent `table-hockey-h2h-scraper/1.0 (+https://github.c
 robots.txt is respected (an HTML "robots.txt", like Finland's 404 page, counts as no rules). No login, admin or
 write endpoints; a 401/403 raises `AccessDenied` and is never worked around.
 
-## Findings so far
+## tulos.poytajaakiekko.fi (Finland) – waiting for access
 
-- **Finland:** the `spjass` GitHub account only has old public repos (`TH-Results`, `THResults`, a 2013/2015
-  Android result app); the source or a data export of tulos.poytajaakiekko.fi is not public there.
-  `/api/tournaments/<id>` answered `{"error":"Invalid API access"}` to an anonymous GET in an earlier probe; it
-  still has to be checked how the public result pages load their data before deciding whether access must be
-  requested.
+- **Public:** `/api/events?limit=500` (all 217 events with their sub-tournaments: Open, Veterans, Juniors, Women,
+  side tournaments), `/api/events/<slug>` and `/api/players/search?q=` (with `worldRankingID` = ITHF id).
+- **Not public:** the results. The site's pages load them from `/api/tournaments/<slug>` with an internal API key
+  sent by their JavaScript; without it the endpoint answers `401 {"error":"Invalid API access"}`. Sending that key
+  from a scraper would be getting around the access check, so the module does not.
+- **What runs now:** `python -m scrapers.finland` fetches the event index, gives every finished sub-tournament its
+  permanent TournamentID (`data/finland/tournament_ids.csv`, keyed by the site's tournament id; name = event name +
+  type when not Open, e.g. `215. Tampere – Veterans`), and probes one results URL so the log shows when access
+  starts working. No Parquet is written yet. Player ids: `worldRankingID` → ITHF/Sportscorpion as everywhere,
+  else 30_000_000+ keyed by the site's player id (`player_id()`).
+- **Access request:** draft in `docs/finland_access_email.md`. The old `spjass` GitHub repos (`TH-Results`,
+  `THResults`) don't contain the site's data.
+
+## stiga.trefik.cz
+
+- **Discovery:** `stolni-hokej.cz/pohar.html` (re-read every run) lists every season. Season statistics (`data`,
+  `data_new`, `ted20xx`) are ignored. National championships are split into one tournament per category: from the
+  index row (2023+), `kategorie.aspx` (2018–2022) or the old hub pages (`index.htm` with "Turnaj jednotlivců /
+  žen / juniorů / veteránů", 2000–2017). Name: `Czech Cup <place> <year>`, `Czech Open <year>`,
+  `Moravia Open <year>`, `Czech Championship <year> – <category>`.
+- **Pages:** from the tournament page every result page in the same folder is followed (`kriz*`, `*cross*`,
+  `*umisteni*`, `*playoff*`, `*_list*`, `*_wr*`, `*ranking*`). Identical cross-tables shown on several pages are read
+  once. The 2026 events use a JSON file (`<tour>/m-<src>.json`) behind `ranking.html`, read directly.
+- **Games:** cross-table cells above the diagonal (each game once; "8:1 + 7:1" = two games), play-off series one row
+  per game ("P" = overtime → `Overtime = Yes`). Cells marked "K" are skipped: in final groups they are results
+  carried over from the basic group, in the play-off they are walkovers.
+- **Names:** cross-tables print short labels ("Kr Lebl", "L.Turoň", "ml Chylík"). They are matched to the event's
+  full names (final table, round tables, play-off and participants pages); a name already placed in another group of
+  the same phase is excluded, and pages without any full names fall back to every name seen on the site within ±3
+  seasons. Only unique matches are used.
+- **Ids:** Trefik `idpl` comes from player links (final table, play-off pages, participants list, the 2026 JSON) and
+  is carried to unlinked events by unique full-name match. ITHF ids come from the participants/WR lists
+  (`ithf/ranking/player.aspx?ID=`) and the 2026 JSON (`wr_id`), else a unique `ranking.txt` name match (CZE preferred).
+- **Checked:** every game of Patrik Petr at Němčice 2023 (38) and of Rainers Kalniņš at Czech Open 2023 (58) equals
+  their `thstats/overview_b.aspx` pages (tests/trefik).
+
+## galdahokejs.lv
+
+- **Discovery:** the Joomla menu from the home page (plus the Riga Cup history, ECh 2024 and `turniri` pages), every
+  section/season page from 2022 on, up to three levels deep. Links to Trefik SW folders (`/stats/<folder>/…`) are
+  collected; links to Sportscorpion, tablehockey.me, escore and table-hockey.eu are not followed (covered elsewhere).
+  The 2021/22 and 2022 season pages link their results to Sportscorpion, so the first galdahokejs events are from
+  September 2023.
+- **Parsing:** the shared Trefik SW parser (`scrapers/common/trefik_sw.py`). Pages declare windows-1257 but older
+  ones contain windows-1250 bytes ("Kalninš"); such pages are decoded as 1250 and each player id keeps its most used
+  spelling. Where an event has no full-name list (Amatieru Līga: only "Ra Ladusans" labels), labels are matched to
+  names elsewhere on the site, then to Latvian players in `players_data.csv`/`ranking.txt` (unique matches only).
+- **Events:** folders of one event (Riga Cup qualification + divisions + top 72, `25RK`/`25RKMain`/`25RK72`) are one
+  tournament, stages prefixed `Qualification`, `Divisions`, `Top 72`. ECh 2024 individual events are named
+  `European Championship 2024 – <category>`; a year is added to names without one. Team championships are skipped.
+- **Window:** 2022-05-01 … 2025-11-30; events in Sportscorpion's list (Latvia, ±1 day) are skipped (none in the
+  window today). Google Sheets links are listed in `data/galdahokejs/google_sheets.csv` (52) but not parsed.
+
+## escore.live
+
+- **Discovery:** event ids 1, 2, … from `/events/<id>/particiants` (the site's own spelling) until 25 ids in a row are
+  missing or private; `/api` is disallowed by robots.txt and not used. Only `table_hockey` singles events are kept
+  (the site also hosts table tennis and beach volleyball).
+- **Games:** each result tab (`/events/<id>/net/<net>`) gives groups and elimination trees; a best-of series gives one
+  row per set (`set_score`, `set_overtimes`). Hidden/pending games and byes are skipped.
+- **Names:** TournamentName = competition name (`Latvijas Kauss 2025/26 #2`), plus the event name when the competition
+  has several singles events (`Ādažu galda hokeja līga - 1. posms – Pro 2026`). Stages: `Basic groups …` (first tab with
+  groups), `Final groups …`, `Playoff [<bracket>] 1/8 … Final`, placement brackets `Playoff 5.-8. place 1/2`.
+- **Ids:** `ithf_id` on the player, else ranking.txt (player's nation), else Sportscorpion name + country, else
+  40_000_000 + escore player id. Events from before 2025-12-01 and events also on table-hockey.eu (same name, ±1 day)
+  are skipped.
 
 ## Known gaps
 
-To be filled in per source as each one is built (team events, old seasons without ids, Google Sheets results on
-galdahokejs.lv, etc.).
+- **trefik:** season 1998/99 (`cz_turnaje/99/…`) is linked from the index but every page is 404. Team championships
+  (`mrdr`, "Turnaj družstev") are skipped: their pages are team tables, not individual games with both players.
+  ~1,100 group games (0.4%) are left out because a short label fits two players of the same event (e.g. two
+  "J.Sládek", "A./m.Šrajer"); each case is listed in the run report. `turnaje2010/mr` only links the individual
+  event from the index (the other 2010 categories are not reached). Round numbers are only known where the page has
+  round tables (most events from ~2016); older group games have `RoundNumber` null.
+
+- **galdahokejs:** Latvian events May 2022 – Aug 2023 are neither on galdahokejs stats pages nor on Sportscorpion's
+  list (some may be in the unparsed Google Sheets). Riga Cup 2025 (6–7 Dec) is after the window, and on escore.live
+  it only has a participant list, so it is in no source. ~740 group games (2%) are left out because a short label
+  matches no single player. Team events (ECh 2024 teams, WT) are skipped.
+- **escore:** "Izlases treniņnometne 2026" (national team training camp, 589 games) is kept as an event; say if
+  training events should be dropped. The Ukrainian Open Championship 2026/27 stages are only scheduled so far.
 
 ## Nightly run
 

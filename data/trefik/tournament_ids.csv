@@ -1,0 +1,361 @@
+key,id,name
+turnaje2026/turnov,3000000001,Czech Cup Turnov 2025
+turnaje2026/mo,3000000002,Moravia Open 2025
+turnaje2026/plzen,3000000003,Czech Cup Plzeň 2025
+turnaje2026/cheb,3000000004,Czech Cup Cheb 2025
+turnaje2026/teplysovice,3000000005,Czech Cup Teplýšovice 2025
+turnaje2026/brno,3000000006,Czech Cup Brno 2026
+turnaje2026/praha,3000000007,Czech Cup Praha 2026
+turnaje2026/nemcice,3000000008,Czech Cup Němčice 2026
+turnaje2026/trinec_new,3000000009,Czech Cup Třinec 2026
+turnaje2026/co,3000000010,Czech Open 2026
+turnaje2025/tur,3000000011,Czech Cup Turnov 2024
+turnaje2025/teplysovice,3000000012,Czech Cup Teplýšovice 2024
+turnaje2025/nem,3000000013,Czech Cup Němčice 2024
+turnaje2025/cheb,3000000014,Czech Cup Cheb 2024
+turnaje2025/olomouc,3000000015,Czech Cup Olomouc 2024
+turnaje2025/mo,3000000016,Moravia Open 2025
+turnaje2025/brno,3000000017,Czech Cup Brno 2025
+turnaje2025/cb,3000000018,Czech Cup České Budějovice 2025
+turnaje2025/trinec,3000000019,Czech Cup Třinec 2025
+turnaje2025/co,3000000020,Czech Open 2025
+turnaje2025/mrj,3000000021,Czech Championship 2025
+turnaje2025/mrvet,3000000022,Czech Championship 2025 – Veterans
+turnaje2025/mrjun,3000000023,Czech Championship 2025 – Juniors
+turnaje2025/mrz,3000000024,Czech Championship 2025 – Women
+turnaje2025/mr55,3000000025,Czech Championship 2025 – 55+
+turnaje2025/mru13,3000000026,Czech Championship 2025 – U13
+turnaje2024/teplysovice,3000000027,Czech Cup Teplýšovice 2023
+turnaje2024/teplysovice2,3000000028,Czech Cup Teplýšovice 2023
+turnaje2024/nemcice,3000000029,Czech Cup Němčice 2023
+turnaje2024/cheb,3000000030,Czech Cup Cheb 2023
+turnaje2024/olomouc,3000000031,Czech Cup Olomouc 2023
+turnaje2024/cb,3000000032,Czech Cup České Budějovice 2024
+turnaje2024/turnov1,3000000033,Czech Cup Turnov 2024
+turnaje2024/turnov2,3000000034,Czech Cup Turnov 2024
+turnaje2024/trinec,3000000035,Czech Cup Třinec 2024
+turnaje2024/co2024,3000000036,Czech Open 2024
+turnaje2024/mr,3000000037,Czech Championship 2024
+turnaje2024/mrv,3000000038,Czech Championship 2024 – Veterans
+turnaje2024/mrj,3000000039,Czech Championship 2024 – Juniors
+turnaje2024/mrz,3000000040,Czech Championship 2024 – Women
+turnaje2024/mro55,3000000041,Czech Championship 2024 – 55+
+turnaje2024/mru13,3000000042,Czech Championship 2024 – U13
+turnaje2023/kladno,3000000043,Czech Cup Kladno 2022
+turnaje2023/pribram,3000000044,Czech Cup Příbram 2022
+turnaje2023/cheb,3000000045,Czech Cup Cheb 2022
+turnaje2023/teplysovice,3000000046,Czech Cup Teplýšovice 2022
+turnaje2023/plzen,3000000047,Czech Cup Plzeň 2023
+turnaje2023/turnov,3000000048,Czech Cup Turnov 2023
+turnaje2023/turnov2,3000000049,Czech Cup Turnov 2023
+turnaje2023/trinec,3000000050,Czech Cup Třinec 2023
+turnaje2023/co2023,3000000051,Czech Open 2023
+turnaje2023/plzen2,3000000052,Czech Cup Plzeň 2023
+turnaje2023/mr,3000000053,Czech Championship 2023
+turnaje2023/mrv,3000000054,Czech Championship 2023 – Veterans
+turnaje2023/mrj,3000000055,Czech Championship 2023 – Juniors
+turnaje2023/mrz,3000000056,Czech Championship 2023 – Women
+turnaje2023/mr55,3000000057,Czech Championship 2023 – 55+
+turnaje2023/mru13,3000000058,Czech Championship 2023 – U13
+turnaje2022/struharov,3000000059,Czech Cup Struhařov 2. říjen 2021 2021
+turnaje2022/nemcice,3000000060,Czech Cup Němčice 30. říjen 2021 2021
+turnaje2022/kladno,3000000061,Czech Cup Kladno 20. listopad 2021 2021
+turnaje2022/pelhrimov,3000000062,Czech Cup Pelhřimov 11. prosinec 2021 2021
+turnaje2022/plzen1,3000000063,Czech Cup Plzeň 15. leden 2022 2022
+turnaje2022/plzen2,3000000064,Czech Cup Plzeň 5. únor 2022 2022
+turnaje2022/pelhrimov2,3000000065,Czech Cup Pelhřimov 26. únor 2022 2022
+turnaje2022/trinec,3000000066,Czech Cup Třinec 19. březen 2022 2022
+turnaje2022/trinec2,3000000067,Czech Cup Třinec 9. duben 2022 2022
+turnaje2022/co2022,3000000068,Czech Open 2022
+turnaje2022/mr,3000000069,Czech Championship 2022
+turnaje2022/mrj,3000000070,Czech Championship 2022 – Juniors
+turnaje2022/mrz,3000000071,Czech Championship 2022 – Women
+turnaje2022/mrv,3000000072,Czech Championship 2022 – Veterans
+turnaje2022/mru13,3000000073,Czech Championship 2022 – U13
+turnaje2022/mr50,3000000074,Czech Championship 2022 – 50+
+turnaje2020/mr,3000000075,Czech Championship 2021
+turnaje2020/mrj,3000000076,Czech Championship 2021 – Juniors
+turnaje2020/mrz,3000000077,Czech Championship 2021 – Women
+turnaje2020/mrv,3000000078,Czech Championship 2021 – Veterans
+turnaje2020/mru13,3000000079,Czech Championship 2021 – U13
+turnaje2020/mr50,3000000080,Czech Championship 2021 – 50+
+turnaje2020/teplysovice,3000000081,Czech Cup Teplýšovice 21. září 2019 2019
+turnaje2020/pelhrimov,3000000082,Czech Cup Pelhřimov 12. říjen 2019 2019
+turnaje2020/praha,3000000083,Czech Cup Praha 2. listopad 2019 2019
+turnaje2020/kladno,3000000084,Czech Cup Kladno 23. listopad 2019 2019
+turnaje2020/teplysovice2,3000000085,Czech Cup Teplýšovice 14. prosinec 2019 2019
+turnaje2020/plzen1,3000000086,Czech Cup Plzeň 11. leden 2020 2020
+turnaje2020/cheb,3000000087,Czech Cup Cheb 1. únor 2020 2020
+turnaje2020/plzen2,3000000088,Czech Cup Plzeň 29. únor 2020 2020
+turnaje2019/struharov,3000000089,Czech Cup Struhařov 22. září 2018 2018
+turnaje2019/praha1,3000000090,Czech Cup Praha 13. říjen 2018 2018
+turnaje2019/pelhrimov1,3000000091,Czech Cup Pelhřimov 10. listopad 2018 2018
+turnaje2019/pelhrimov2,3000000092,Czech Cup Pelhřimov 24. listopad 2018 2018
+turnaje2019/praha2,3000000093,Czech Cup Praha 15. prosinec 2018 2018
+turnaje2019/kladno,3000000094,Czech Cup Kladno 12. leden 2019 2019
+turnaje2019/brno,3000000095,Czech Cup Brno 2. únor 2019 2019
+turnaje2019/cheb,3000000096,Czech Cup Cheb 2. březen 2019 2019
+turnaje2019/litomysl,3000000097,Czech Cup Litomyšl 30. březen 2019 2019
+turnaje2019/co2019,3000000098,Czech Open 2019
+turnaje2019/mr,3000000099,Czech Championship 2019
+turnaje2019/mrj,3000000100,Czech Championship 2019 – Juniors
+turnaje2019/mrz,3000000101,Czech Championship 2019 – Women
+turnaje2019/mrv,3000000102,Czech Championship 2019 – Veterans
+turnaje2019/mru13,3000000103,Czech Championship 2019 – U13
+turnaje2019/mr50,3000000104,Czech Championship 2019 – 50+
+turnaje2018/teplysovice,3000000105,Czech Cup Teplýšovice 23. září 2017 2017
+turnaje2018/pelhrimov1,3000000106,Czech Cup Pelhřimov 14. říjen 2017 2017
+turnaje2018/nemcice,3000000107,Czech Cup Němčice u Litomyšle 4. listopad 2017 2017
+turnaje2018/praha,3000000108,Czech Cup Praha 16. prosinec 2017 2017
+turnaje2018/plzen1,3000000109,Czech Cup Plzeň 27. leden 2018 2018
+turnaje2018/plzen2,3000000110,Czech Cup Plzeň 24. únor 2018 2018
+turnaje2018/pelhrimov2,3000000111,Czech Cup Pelhřimov 24. březen 2018 2018
+turnaje2018/co,3000000112,Czech Open 2018
+turnaje2018/pribram,3000000113,Czech Cup Příbram 12. květen 2018 2018
+turnaje2018/mr,3000000114,Czech Championship 2018
+turnaje2018/mrjz,3000000115,Czech Championship 2018 – Juniors + Women
+turnaje2018/mrv,3000000116,Czech Championship 2018 – Veterans
+turnaje2017/teplysovice,3000000117,Czech Cup Teplýšovice 2016
+turnaje2017/plzen,3000000118,Czech Cup Plzeň 2016
+turnaje2017/litomysl,3000000119,Czech Cup Litomyšl 2016
+turnaje2017/praha,3000000120,Czech Cup Praha 2016
+turnaje2017/brno,3000000121,Czech Cup Brno 2017
+turnaje2017/cheb,3000000122,Czech Cup Cheb 2017
+turnaje2017/pelhrimov,3000000123,Czech Cup Pelhřimov 2017
+turnaje2017/pribram,3000000124,Czech Cup Příbram 2017
+turnaje2017/co,3000000125,Czech Open 2017
+turnaje2017/milovice,3000000126,Czech Cup Milovice 2017
+turnaje2017/mr/mr_jednotlivci_krizf,3000000127,Czech Championship 2017
+turnaje2017/mr/mr_jz_krizb,3000000128,Czech Championship 2017 – Juniors + Women
+turnaje2017/mr/mr_veterani_krizb,3000000129,Czech Championship 2017 – Veterans
+turnaje2016/teplysovice,3000000130,Czech Cup Teplýšovice 2015
+turnaje2016/vysocany,3000000131,Czech Cup Praha - Vysočany 2015
+turnaje2016/litomysl,3000000132,Czech Cup Litomyšl 2015
+turnaje2016/satalice,3000000133,Czech Cup Praha - Satalice 2015
+turnaje2016/brno,3000000134,Czech Cup Brno 2016
+turnaje2016/kladno,3000000135,Czech Cup Kladno 2016
+turnaje2016/pelhrimov,3000000136,Czech Cup Pelhřimov 2016
+turnaje2016/milovice,3000000137,Czech Cup Milovice 2016
+turnaje2016/co,3000000138,Czech Open 2016
+turnaje2016/cheb,3000000139,Czech Cup Cheb 2016
+turnaje2016/mr/jedn,3000000140,Czech Championship 2016
+turnaje2016/mr/jun_zen,3000000141,Czech Championship 2016 – Women
+turnaje2016/mr/vet,3000000142,Czech Championship 2016 – Veterans
+turnaje2015/praha,3000000143,Czech Cup Praha 2014
+turnaje2015/trinec,3000000144,Czech Cup Třinec 2014
+turnaje2015/litomysl,3000000145,Czech Cup Litomyšl 2014
+turnaje2015/teplysovice,3000000146,Czech Cup Teplýšovice 2014
+turnaje2015/brno,3000000147,Czech Cup Brno 2015
+turnaje2015/kladno,3000000148,Czech Cup Kladno 2015
+turnaje2015/pelhrimov,3000000149,Czech Cup Pelhřimov 2015
+turnaje2015/milovice,3000000150,Czech Cup Milovice 2015
+turnaje2015/co,3000000151,Czech Open 2015
+turnaje2015/pribram,3000000152,Czech Cup Příbram 2015
+turnaje2015/mr/krizmrj,3000000153,Czech Championship 2015
+turnaje2015/mr/krizmrzeny,3000000154,Czech Championship 2015 – Women
+turnaje2015/mr/krizmrjun,3000000155,Czech Championship 2015 – Juniors
+turnaje2015/mr/krizmrvet,3000000156,Czech Championship 2015 – Veterans
+turnaje2014/petroupim,3000000157,Czech Cup Petroupim 2013
+turnaje2014/bratislava,3000000158,Czech Cup Bratislava 2013
+turnaje2014/litomysl,3000000159,Czech Cup Litomyšl 2013
+turnaje2014/praha,3000000160,Czech Cup Praha 2013
+turnaje2014/brno,3000000161,Czech Cup Brno 2014
+turnaje2014/plzen,3000000162,Czech Cup Plzeň 2014
+turnaje2014/kladno,3000000163,Czech Cup Kladno 2014
+turnaje2014/milovice,3000000164,Czech Cup Milovice 2014
+turnaje2014/co,3000000165,Czech Open 2014
+turnaje2014/rokycany,3000000166,Czech Cup Rokycany 2014
+turnaje2014/mr/krizmrj,3000000167,Czech Championship 2014
+turnaje2014/mr/krizmrzeny,3000000168,Czech Championship 2014 – Women
+turnaje2014/mr/krizmrjun,3000000169,Czech Championship 2014 – Juniors
+turnaje2014/mr/krizmrvet,3000000170,Czech Championship 2014 – Veterans
+turnaje2013/teplysovice,3000000171,Czech Cup Teplýšovice 2012
+turnaje2013/letovice,3000000172,Czech Cup Letovice 2012
+turnaje2013/trinec,3000000173,Czech Cup Třinec 2012
+turnaje2013/praha,3000000174,Czech Cup Praha 2012
+turnaje2013/brno,3000000175,Czech Cup Brno 2013
+turnaje2013/kladno,3000000176,Czech Cup Kladno 2013
+turnaje2013/litomysl,3000000177,Czech Cup Litomyšl 2013
+turnaje2013/milovice,3000000178,Czech Cup Milovice 2013
+turnaje2013/co,3000000179,Czech Open 2013
+turnaje2013/jihlava,3000000180,Czech Cup Jihlava 2013
+turnaje2013/mr/jednotlivci,3000000181,Czech Championship 2013
+turnaje2013/mr/zeny,3000000182,Czech Championship 2013 – Women
+turnaje2013/mr/juniori,3000000183,Czech Championship 2013 – Juniors
+turnaje2013/mr/veterani,3000000184,Czech Championship 2013 – Veterans
+turnaje2012/kamenak,3000000185,Czech Cup Kamenný Újezdec 2011
+turnaje2012/letovice,3000000186,Czech Cup Letovice 2011
+turnaje2012/trinec,3000000187,Czech Cup Třinec 2011
+turnaje2012/praha,3000000188,Czech Cup Praha 2011
+turnaje2012/plzen,3000000189,Czech Cup Plzeň 2012
+turnaje2012/kladno,3000000190,Czech Cup Kladno 2012
+turnaje2012/litomysl,3000000191,Czech Cup Litomyšl 2012
+turnaje2012/milovice,3000000192,Czech Cup Milovice 2012
+turnaje2012/co,3000000193,Czech Open 2012
+turnaje2012/jihlava,3000000194,Czech Cup Jihlava 2012
+turnaje2012/mr/jednotlivci,3000000195,Czech Championship 2012
+turnaje2012/mr/zeny,3000000196,Czech Championship 2012 – Women
+turnaje2012/mr/juniori,3000000197,Czech Championship 2012 – Juniors
+turnaje2012/mr/veterani,3000000198,Czech Championship 2012 – Veterans
+turnaje2011/ku,3000000199,Czech Cup Kamenný Přívoz 2010
+turnaje2011/trinec,3000000200,Czech Cup Třinec 2010
+turnaje2011/letovice,3000000201,Czech Cup Letovice 2010
+turnaje2011/cb,3000000202,Czech Cup České Budějovice 2010
+turnaje2011/praha,3000000203,Czech Cup Praha 2010
+turnaje2011/pardubice,3000000204,Czech Cup Pardubice 2011
+turnaje2011/cheb,3000000205,Czech Cup Cheb 2011
+turnaje2011/milovice,3000000206,Czech Cup Milovice 2011
+turnaje2011/co,3000000207,Czech Open 2011
+turnaje2011/plzenec,3000000208,Czech Cup Plzeň - Starý Plzenec 2011
+turnaje2011/mr/jednotlivci,3000000209,Czech Championship 2011
+turnaje2011/mr/zeny,3000000210,Czech Championship 2011 – Women
+turnaje2011/mr/juniori,3000000211,Czech Championship 2011 – Juniors
+turnaje2011/mr/veterani,3000000212,Czech Championship 2011 – Veterans
+turnaje2010/ku,3000000213,Czech Cup Kamenný Přívoz 2009
+turnaje2010/trinec,3000000214,Czech Cup Třinec 2009
+turnaje2010/praha1,3000000215,Czech Cup Praha 2009
+turnaje2010/litomysl,3000000216,Czech Cup Litomyšl 2009
+turnaje2010/praha2,3000000217,Czech Cup Praha 2009
+turnaje2010/pardubice,3000000218,Czech Cup Pardubice 2010
+turnaje2010/plzen,3000000219,Czech Cup Plzeň - Štěnovice 2010
+turnaje2010/cheb,3000000220,Czech Cup Cheb 2010
+turnaje2010/milovice,3000000221,Czech Cup Milovice 2010
+turnaje2010/co,3000000222,Czech Open 2010
+turnaje2010/mr/vysl,3000000223,Czech Championship 2010
+turnaje2009/ku,3000000224,Czech Cup Kamenný Újezdec 2008
+turnaje2009/cb,3000000225,Czech Cup České Budějovice 2008
+turnaje2009/li1,3000000226,Czech Cup Litomyšl 2008
+turnaje2009/praha1,3000000227,Czech Cup Praha 2008
+turnaje2009/pard,3000000228,Czech Cup Pardubice 2009
+turnaje2009/praha2,3000000229,Czech Cup Praha 2009
+turnaje2009/lit,3000000230,Czech Cup Litomyšl 2009
+turnaje2009/milovice,3000000231,Czech Cup Milovice 2009
+turnaje2009/czechopen,3000000232,Czech Open 2009
+turnaje2009/trinec,3000000233,Czech Cup Třinec 2009
+turnaje2009/mr/jednotlivci,3000000234,Czech Championship 2009
+turnaje2009/mr/zeny,3000000235,Czech Championship 2009 – Women
+turnaje2009/mr/juniori,3000000236,Czech Championship 2009 – Juniors
+turnaje2009/mr/veterani,3000000237,Czech Championship 2009 – Veterans
+turnaje2008/ujezdec,3000000238,Czech Cup Kamenný Újezdec 2007
+turnaje2008/svitavy,3000000239,Czech Cup Svitavy - Banín 2007
+turnaje2008/trinec,3000000240,Czech Cup Třinec 2007
+turnaje2008/cb,3000000241,Czech Cup České Budějovice 2007
+turnaje2008/praha,3000000242,Czech Cup Praha 2007
+turnaje2008/pardubice,3000000243,Czech Cup Pardubice 2008
+turnaje2008/stenovice,3000000244,Czech Cup Plzeň - Štěnovice 2008
+turnaje2008/milovice,3000000245,Czech Cup Milovice 2008
+turnaje2008/czechopen,3000000246,Czech Open 2008
+turnaje2008/litomysl,3000000247,Czech Cup Litomyšl 2008
+turnaje2008/mr/jednotlivci,3000000248,Czech Championship 2008
+turnaje2008/mr/zeny,3000000249,Czech Championship 2008 – Women
+turnaje2008/mr/juniori,3000000250,Czech Championship 2008 – Juniors
+turnaje2008/mr/veterani,3000000251,Czech Championship 2008 – Veterans
+turnaje2007/svitavy,3000000252,Czech Cup Svitavy 2006
+turnaje2007/pardubice,3000000253,Czech Cup Pardubice 2006
+turnaje2007/budejovice,3000000254,Czech Cup České Budějovice 2006
+turnaje2007/praha,3000000255,Czech Cup Praha 2006
+turnaje2007/plzen,3000000256,Czech Cup Plzeň 2007
+turnaje2007/holice,3000000257,Czech Cup Holice 2007
+turnaje2007/litomysl,3000000258,Czech Cup Litomyšl 2007
+turnaje2007/milovice,3000000259,Czech Cup Milovice 2007
+turnaje2007/pribram,3000000260,Czech Cup Příbram 2007
+turnaje2007/czechopen,3000000261,Czech Cup Plzeň 2007
+turnaje2007/mr/jednotlivci,3000000262,Czech Championship 2007
+turnaje2007/mr/zeny,3000000263,Czech Championship 2007 – Women
+turnaje2007/mr/juniori,3000000264,Czech Championship 2007 – Juniors
+turnaje2007/mr/veterani,3000000265,Czech Championship 2007 – Veterans
+turnaje2006/ujezdec,3000000266,Czech Cup Kamenný Újezdec 2005
+turnaje2006/trinec,3000000267,Czech Cup Třinec 2005
+turnaje2006/praha,3000000268,Czech Cup Praha 2005
+turnaje2006/plzen,3000000269,Czech Cup Plzeň 2005
+turnaje2006/holice,3000000270,Czech Cup Holice 2006
+turnaje2006/plzen2,3000000271,Czech Cup Plzeň 2006
+turnaje2006/litomysl,3000000272,Czech Cup Litomyšl 2006
+turnaje2006/czechopenr,3000000273,Czech Cup Praha 2006
+turnaje2006/milovice,3000000274,Czech Cup Milovice 2006
+turnaje2006/pribram,3000000275,Czech Cup Příbram 2006
+turnaje2006/mr/jednotlivci,3000000276,Czech Championship 2006
+turnaje2006/mr/zeny,3000000277,Czech Championship 2006 – Women
+turnaje2006/mr/juniori,3000000278,Czech Championship 2006 – Juniors
+turnaje2006/mr/veterani,3000000279,Czech Championship 2006 – Veterans
+turnaje2005/ujezdec,3000000280,Czech Cup Kamenný Újezdec 2004
+turnaje2005/usti,3000000281,Czech Cup Ústí nad Labem 2004
+turnaje2005/trinec,3000000282,Czech Cup Třinec 2004
+turnaje2005/holice,3000000283,Czech Cup Holice 2004
+turnaje2005/praha,3000000284,Czech Cup Praha 2004
+turnaje2005/litomysl,3000000285,Czech Cup Litomyšl 2005
+turnaje2005/brno,3000000286,Czech Cup Brno 2005
+turnaje2005/plzen,3000000287,Czech Cup Plzeň 2005
+turnaje2005/milovice,3000000288,Czech Cup Milovice 2005
+turnaje2005/czechopen,3000000289,Czech Open 2005
+turnaje2005/mr/jednotlivci,3000000290,Czech Championship 2005
+turnaje2005/mr/zeny,3000000291,Czech Championship 2005 – Women
+turnaje2005/mr/juniori,3000000292,Czech Championship 2005 – Juniors
+turnaje2005/mr/veterani,3000000293,Czech Championship 2005 – Veterans
+turnaje2004/plzen,3000000294,Czech Cup Plzeň 2003
+turnaje2004/usti,3000000295,Czech Cup Ústí nad Labem 2003
+turnaje2004/litomysl,3000000296,Czech Cup Litomyšl 2003
+turnaje2004/plzen1,3000000297,Czech Cup Plzeň 2003
+turnaje2004/holice,3000000298,Czech Cup Holice 2004
+turnaje2004/cheb,3000000299,Czech Cup Cheb 2004
+turnaje2004/trinec,3000000300,Czech Cup Třinec 2004
+turnaje2004/milovice,3000000301,Czech Cup Milovice 2004
+turnaje2004/pragueopen/v,3000000302,Czech Open 2004
+turnaje2004/pribram,3000000303,Czech Cup Příbram 2004
+turnaje2004/mr/jednotlivci,3000000304,Czech Championship 2004
+turnaje2004/mr/zeny,3000000305,Czech Championship 2004 – Women
+turnaje2004/mr/juniori,3000000306,Czech Championship 2004 – Juniors
+turnaje2004/mr/veterani,3000000307,Czech Championship 2004 – Veterans
+turnaje2003/plzen1,3000000308,Czech Cup Plzeň 2002
+turnaje2003/ujezdec,3000000309,Czech Cup Kamenný Újezdec 2002
+turnaje2003/plzen2,3000000310,Czech Cup Plzeň 2002
+turnaje2003/svitavy,3000000311,Czech Cup Svitavy 2002
+turnaje2003/praha,3000000312,Czech Cup Praha 2002
+turnaje2003/holice,3000000313,Czech Cup Holice 2003
+turnaje2003/plzen3,3000000314,Czech Cup Plzeň 2003
+turnaje2003/prague,3000000315,Czech Cup Praha 2003
+turnaje2003/milovice,3000000316,Czech Cup Milovice 2003
+turnaje2003/pribram,3000000317,Czech Cup Příbram 2003
+turnaje2003/mr/jednotlivci,3000000318,Czech Championship 2003
+turnaje2003/mr/zeny,3000000319,Czech Championship 2003 – Women
+turnaje2003/mr/juniori,3000000320,Czech Championship 2003 – Juniors
+turnaje2003/mr/veterani,3000000321,Czech Championship 2003 – Veterans
+turnaje2002/plzen1,3000000322,Czech Cup Plzeň 2001
+turnaje2002/kam_uj,3000000323,Czech Cup Kamenný Újezdec 2001
+turnaje2002/plzen2,3000000324,Czech Cup Plzeň 2001
+turnaje2002/plzen3,3000000325,Czech Cup Plzeň 2001
+turnaje2002/zehusice,3000000326,Czech Cup Čáslav 2001
+turnaje2002/holice,3000000327,Czech Cup Holice 2002
+turnaje2002/pribram1,3000000328,Czech Cup Příbram 2002
+turnaje2002/praha,3000000329,Czech Cup Praha 2002
+turnaje2002/milovice,3000000330,Czech Cup Milovice 2002
+turnaje2002/pribram2,3000000331,Czech Cup Příbram 2002
+turnaje2002/mr/jednotlivci,3000000332,Czech Championship 2002
+turnaje2002/mr/zeny,3000000333,Czech Championship 2002 – Women
+turnaje2002/mr/juniori,3000000334,Czech Championship 2002 – Juniors
+turnaje2002/mr/veterani,3000000335,Czech Championship 2002 – Veterans
+turnaje2001/holice,3000000336,Czech Cup Holice 2000
+turnaje2001/ujezdec,3000000337,Czech Cup Kamenný Újezdec 2000
+turnaje2001/pribram,3000000338,Czech Cup Příbram 2000
+turnaje2001/praha,3000000339,Czech Cup Praha 2000
+turnaje2001/plzen,3000000340,Czech Cup Plzeň 2000
+turnaje2001/holice2,3000000341,Czech Cup Holice 2001
+turnaje2001/pardubice,3000000342,Czech Cup Pardubice 2001
+turnaje2001/milovice,3000000343,Czech Cup Milovice 2001
+turnaje2001/trinec,3000000344,Czech Cup Třinec 2001
+turnaje2001/pribram2,3000000345,Czech Cup Příbram 2001
+turnaje2001/mr/jednotlivci,3000000346,Czech Championship 2000
+turnaje2001/mr/zeny,3000000347,Czech Championship 2001 – Women
+turnaje2001/mr/juniori,3000000348,Czech Championship 2001 – Juniors
+turnaje2001/mr/veterani,3000000349,Czech Championship 2001 – Veterans
+turnaje2000/plzen,3000000350,Czech Cup Plzeň 2000
+turnaje2000/jicin,3000000351,Czech Cup Jičín 2000
+turnaje2000/usti,3000000352,Czech Cup Ústí nad Labem 2000
+turnaje2000/praha,3000000353,Czech Cup Praha 2000
+turnaje2000/milovice,3000000354,Czech Cup Milovice 2000
+turnaje2000/ujezdec,3000000355,Czech Cup Kamenný Újezdec 2000
+turnaje2000/pribram,3000000356,Czech Cup Příbram 2000
+turnaje2000/mr/jednotlivci,3000000357,Czech Championship 2000
+turnaje2000/mr/zeny,3000000358,Czech Championship 2000 – Women
+turnaje2000/mr/juniori,3000000359,Czech Championship 2000 – Juniors
+turnaje2000/mr/veterani,3000000360,Czech Championship 2000 – Veterans

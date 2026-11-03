@@ -1,0 +1,290 @@
+key,id,name
+17/g45,5100000001,Basic groups 1
+17/g46,5100000002,Basic groups 2
+17/g47,5100000003,Basic groups 3
+17/g48,5100000004,Basic groups 4
+17/g49,5100000005,Final groups 1.-24. place 1. Līga
+17/g50,5100000006,Final groups 25.-48. place 2.līga
+17/g51,5100000007,Final groups 49.-68. place 3.līga
+17/t24r1,5100000008,Playoff 1/8
+17/t24r2,5100000009,Playoff 1/4
+17/t24r3,5100000010,Playoff 1/2
+17/t24r4,5100000011,Playoff Final
+17/t25r1,5100000012,Playoff 2. līgas 1/2
+17/t25r2,5100000013,Playoff 2. līgas Final
+17/t27r1,5100000014,Playoff 3. līgas 1/2
+17/t27r2,5100000015,Playoff 3. līgas Final
+17/t29r1,5100000016,Playoff 3.v.-4.v. Final
+18/g42,5100000017,Basic groups 1
+18/g43,5100000018,Basic groups 2
+18/g44,5100000019,Basic groups 3
+18/g52,5100000020,Final groups 9.-24. place AL 1.līga
+18/g53,5100000021,Final groups 25.-39. place AL 2.līga
+29/g64,5100000022,Basic groups 1
+29/g65,5100000023,Basic groups 2
+29/g66,5100000024,Basic groups 3
+29/g67,5100000025,Basic groups 4
+29/g70,5100000026,Final groups 1.-24. place LK 1.līga
+29/g71,5100000027,Final groups 25.-44. place LK 2.līga
+29/g72,5100000028,Final groups 45.-64. place LK 3.līga
+29/t38r1,5100000029,Playoff 1/8
+29/t38r2,5100000030,Playoff 1/4
+29/t38r3,5100000031,Playoff 1/2
+29/t38r4,5100000032,Playoff Final
+29/t39r1,5100000033,Playoff 3.-4. place
+29/t44r1,5100000034,Playoff 25.-28. place 1/2
+29/t44r2,5100000035,Playoff 25.-28. place Final
+29/t47r1,5100000036,Playoff 45.-48. place 1/2
+29/t47r2,5100000037,Playoff 45.-48. place Final
+30/g68,5100000038,Basic groups 1
+30/g69,5100000039,Basic groups 2
+30/g73,5100000040,Final groups 1.-13. place AL 1.līga
+30/g75,5100000041,Final groups 14.-26. place AL 2.līga
+33/g211,5100000042,Basic groups 1
+33/g212,5100000043,Basic groups 2
+33/g213,5100000044,Basic groups 3
+33/g214,5100000045,Final groups 1.-18. place
+33/g215,5100000046,Final groups 19.-31. place
+33/g216,5100000047,Final groups 19.-31. place #2
+33/t239r1,5100000048,Playoff 1/4
+33/t239r2,5100000049,Playoff 1/2
+33/t239r3,5100000050,Playoff Final
+33/t240r1,5100000051,Playoff 3.-4. place
+35/g220,5100000052,Basic groups 1
+35/g221,5100000053,Basic groups 2
+35/g222,5100000054,Basic groups 3
+35/g223,5100000055,Basic groups 4
+35/g224,5100000056,Final groups 1.-32. place 1. līga
+35/g225,5100000057,Final groups 33.-56. place 2. līga
+35/g226,5100000058,Final groups 57.-80. place 3. līga
+35/g227,5100000059,Final groups 81.-100. place 4. līga
+35/g228,5100000060,Final groups 101.-118. place 5. līga
+35/t243r1,5100000061,Playoff 5. līga 1/2
+35/t243r2,5100000062,Playoff 5. līga Final
+35/t244r1,5100000063,Playoff 4. līga 1/2
+35/t244r2,5100000064,Playoff 4. līga Final
+35/t245r1,5100000065,Playoff 4. līga 3.-4. place
+35/t246r1,5100000066,Playoff 3. līga 1/2
+35/t246r2,5100000067,Playoff 3. līga Final
+35/t247r1,5100000068,Playoff 2. līga 1/2
+35/t247r2,5100000069,Playoff 2. līga Final
+35/t248r1,5100000070,Playoff 1. līga 1/8
+35/t248r2,5100000071,Playoff 1. līga 1/4
+35/t248r3,5100000072,Playoff 1. līga 1/2
+35/t248r4,5100000073,Playoff 1. līga Final
+35/t249r1,5100000074,Playoff 1. līga 3.-4. place
+36/g217,5100000075,Basic groups 1
+36/g218,5100000076,Basic groups 2
+36/g219,5100000077,Basic groups 3
+38/g230,5100000078,Basic groups
+38/t256r1,5100000079,Playoff 1/2
+38/t256r2,5100000080,Playoff Final
+38/t257r1,5100000081,Playoff 3.-4. place
+38/t258r1,5100000082,Playoff 5.-8. place 1/2
+38/t258r2,5100000083,Playoff 5.-8. place Final
+38/t259r1,5100000084,Playoff 7.-8. place
+38/t260r1,5100000085,Playoff 9.-12. place 1/2
+38/t260r2,5100000086,Playoff 9.-12. place Final
+38/t261r1,5100000087,Playoff 11.-12. place
+38/t262r1,5100000088,Playoff 13.-16. place 1/2
+38/t262r2,5100000089,Playoff 13.-16. place Final
+38/t263r1,5100000090,Playoff 15.-16. place
+38/t264r1,5100000091,Playoff 17.-20. place 1/2
+38/t264r2,5100000092,Playoff 17.-20. place Final
+38/t265r1,5100000093,Playoff 19.-20. place
+39/g276,5100000094,Basic groups Pro
+39/t295r1,5100000095,Playoff 1/2
+39/t295r2,5100000096,Playoff Final
+39/t296r1,5100000097,Playoff 3.-4. place
+40/g277,5100000098,Basic groups Amatieri - A grupa
+40/g278,5100000099,Basic groups Amatieri - B grupa
+40/t291r1,5100000100,Playoff 1/4
+40/t291r2,5100000101,Playoff 1/2
+40/t291r3,5100000102,Playoff Final
+40/t292r1,5100000103,Playoff 3.-4. place
+40/t293r1,5100000104,Playoff 5.-8. place 1/2
+40/t293r2,5100000105,Playoff 5.-8. place Final
+40/t294r1,5100000106,Playoff 7.-8. place
+40/g279,5100000107,Final groups 9.-14. place
+41/g249,5100000108,Basic groups Jun A grupa
+41/g250,5100000109,Basic groups Jun B grupa
+41/g251,5100000110,Basic groups Jun C grupa
+41/g252,5100000111,Basic groups Jun D grupa
+41/g259,5100000112,Final groups 1.-20. place JUN 1.līga
+41/g260,5100000113,Final groups 21.-40. place JUN 2.līga
+41/g262,5100000114,Final groups 41.-52. place JUN 3.līga
+41/g263,5100000115,Final groups 53.-64. place JUN 3.līga x2
+41/t276r1,5100000116,Playoff 1/4
+41/t276r2,5100000117,Playoff 1/2
+41/t276r3,5100000118,Playoff Final
+41/t277r1,5100000119,Playoff 3.-4. place
+41/t286r1,5100000120,Playoff U13 1/2
+41/t286r2,5100000121,Playoff U13 Final
+41/t287r1,5100000122,Playoff U13 3.-4. place
+42/g248,5100000123,Basic groups Siev A grupa
+42/g258,5100000124,Final groups Siev A grupa 2
+42/g266,5100000125,Final groups Siev 2.līga
+42/g267,5100000126,Final groups Siev 2.līga x2
+42/t283r1,5100000127,Playoff Siev 1/4
+42/t283r2,5100000128,Playoff Siev 1/2
+42/t283r3,5100000129,Playoff Siev Final
+42/t284r1,5100000130,Playoff Siev 3.-4. place
+42/t285r1,5100000131,Playoff Siev 5.-6. place
+43/g247,5100000132,Basic groups Sen A grupa
+43/g257,5100000133,Final groups Sen A grupa 2
+43/g268,5100000134,Final groups Sen 2.līga
+43/g269,5100000135,Final groups Sen 2.līga x2
+43/t288r1,5100000136,Playoff Sen 1/4
+43/t288r2,5100000137,Playoff Sen 1/2
+43/t288r3,5100000138,Playoff Sen Final
+43/t289r1,5100000139,Playoff Sen 3.-4. place
+43/t290r1,5100000140,Playoff Sen 5.-6. place
+45/g313,5100000141,Basic groups
+45/t326r1,5100000142,Playoff 1/4
+45/t326r2,5100000143,Playoff 1/2
+45/t326r3,5100000144,Playoff Final
+45/t327r1,5100000145,Playoff 3.-4. place
+48/g282,5100000146,Basic groups
+48/t300r1,5100000147,Playoff 1/2
+48/t300r2,5100000148,Playoff Final
+48/t301r1,5100000149,Playoff 3.-4. place
+48/t302r1,5100000150,Playoff 5.-8. place 1/2
+48/t302r2,5100000151,Playoff 5.-8. place Final
+48/t303r1,5100000152,Playoff 7.-8. place
+48/t304r1,5100000153,Playoff 9.-12. place 1/2
+48/t304r2,5100000154,Playoff 9.-12. place Final
+48/t305r1,5100000155,Playoff 11.-12. place
+48/t306r1,5100000156,Playoff 13.-16. place 1/2
+48/t306r2,5100000157,Playoff 13.-16. place Final
+48/t307r1,5100000158,Playoff 15.-16. place
+49/g299,5100000159,Basic groups PRO - A grupa
+49/g300,5100000160,Basic groups PRO - B grupa
+49/t308r1,5100000161,Playoff 1/8
+49/t308r2,5100000162,Playoff 1/4
+49/t308r3,5100000163,Playoff 1/2
+49/t308r4,5100000164,Playoff Final
+49/t309r1,5100000165,Playoff 3.-4. place
+49/t310r1,5100000166,Playoff 5.-8. place 1/2
+49/t310r2,5100000167,Playoff 5.-8. place Final
+49/t311r1,5100000168,Playoff 7.-8. place
+49/t312r1,5100000169,Playoff 9.-12. place 1/2
+49/t312r2,5100000170,Playoff 9.-12. place Final
+49/t313r1,5100000171,Playoff 11.-12. place
+50/g297,5100000172,Basic groups Amatieri - A grupa
+50/g298,5100000173,Basic groups Amatieri - B grupa
+50/t314r1,5100000174,Playoff 1/4
+50/t314r2,5100000175,Playoff 1/2
+50/t314r3,5100000176,Playoff Final
+50/t315r1,5100000177,Playoff 3.-4. place
+50/t316r1,5100000178,Playoff 5.-8. place 1/2
+50/t316r2,5100000179,Playoff 5.-8. place Final
+50/t317r1,5100000180,Playoff 7.-8. place
+50/g302,5100000181,Final groups 9.-14. place Amatieri - 2.līga
+53/g309,5100000182,Basic groups LK Grupa 1
+53/g310,5100000183,Basic groups LK Grupa 2
+53/g311,5100000184,Basic groups LK Grupa 3
+53/g312,5100000185,Basic groups LK Grupa 4
+53/g316,5100000186,Final groups 1.-24. place LK 1.līga
+53/g317,5100000187,Final groups 25.-48. place LK 2.līga
+53/g318,5100000188,Final groups 49.-68. place LK 3.līga
+53/t330r1,5100000189,Playoff 1/8
+53/t330r2,5100000190,Playoff 1/4
+53/t330r3,5100000191,Playoff 1/2
+53/t330r4,5100000192,Playoff Final
+53/t331r1,5100000193,Playoff 3.-4. place
+53/t336r1,5100000194,Playoff 25.-28. place 1/2
+53/t336r2,5100000195,Playoff 25.-28. place Final
+53/t338r1,5100000196,Playoff 49.-52. place 1/2
+53/t338r2,5100000197,Playoff 49.-52. place Final
+54/g306,5100000198,Basic groups AL Grupa 1
+54/g307,5100000199,Basic groups AL Grupa 2
+54/g308,5100000200,Basic groups AL Grupa 3
+54/g314,5100000201,Final groups 1.-20. place AL 1.līga
+54/g315,5100000202,Final groups 21.-39. place AL 2.līga
+61/g339,5100000203,Basic groups 1
+61/g340,5100000204,Basic groups 2
+61/g341,5100000205,Basic groups 3
+61/g342,5100000206,Final groups 34.-40. place
+61/g344,5100000207,Final groups 1.-18. place
+61/g345,5100000208,Final groups 19.-33. place
+61/g346,5100000209,Final groups 3. līga 2.aplis
+61/t357r1,5100000210,Playoff 1/8
+61/t357r2,5100000211,Playoff 1/4
+61/t357r3,5100000212,Playoff 1/2
+61/t357r4,5100000213,Playoff Final
+61/t358r1,5100000214,Playoff 3.-4. place
+61/t363r1,5100000215,Playoff U13 2.-5.vieta 1/2
+61/t363r2,5100000216,Playoff U13 2.-5.vieta Final
+67/g367,5100000217,Basic groups
+67/t392r1,5100000218,Playoff 1/2
+67/t392r2,5100000219,Playoff Final
+67/t393r1,5100000220,Playoff 3.-4. place
+67/t394r1,5100000221,Playoff 5.-8. place 1/2
+67/t394r2,5100000222,Playoff 5.-8. place Final
+67/t395r1,5100000223,Playoff 7.-8. place
+67/t396r1,5100000224,Playoff 9.-12. place 1/2
+67/t396r2,5100000225,Playoff 9.-12. place Final
+67/t397r1,5100000226,Playoff 11.-12. place
+67/t398r1,5100000227,Playoff 13.-16. place 1/2
+67/t398r2,5100000228,Playoff 13.-16. place Final
+67/t399r1,5100000229,Playoff 15.-16. place
+67/g394,5100000230,Final groups 17.-21. place
+73/g386,5100000231,Basic groups PRO kategorija
+73/t388r1,5100000232,Playoff 5.-8. place 1/2
+73/t388r2,5100000233,Playoff 5.-8. place Final
+73/t389r1,5100000234,Playoff 7.-8. place
+73/t390r1,5100000235,Playoff 1/2
+73/t390r2,5100000236,Playoff Final
+73/t391r1,5100000237,Playoff 3.-4. place
+74/g389,5100000238,Basic groups Amatieru kategorija
+74/t385r1,5100000239,Playoff 1/4
+74/t385r2,5100000240,Playoff 1/2
+74/t385r3,5100000241,Playoff Final
+74/t386r1,5100000242,Playoff 3.-4. place
+74/t387r1,5100000243,Playoff 5.-6. place
+80/g411,5100000244,Basic groups
+80/t400r1,5100000245,Playoff 1/4
+80/t400r2,5100000246,Playoff 1/2
+80/t400r3,5100000247,Playoff Final
+80/t401r1,5100000248,Playoff 3.-4. place
+80/t402r1,5100000249,Playoff 5.-8. place 1/2
+80/t402r2,5100000250,Playoff 5.-8. place Final
+80/t404r1,5100000251,Playoff 9.-16. place 1/4
+80/t404r2,5100000252,Playoff 9.-16. place 1/2
+80/t404r3,5100000253,Playoff 9.-16. place Final
+80/t405r1,5100000254,Playoff 11.-12. place
+80/t406r1,5100000255,Playoff 13.-16. place 1/2
+80/t408r1,5100000256,Playoff 17.-24. place 1/4
+80/t408r2,5100000257,Playoff 17.-24. place 1/2
+80/t408r3,5100000258,Playoff 17.-24. place Final
+80/t409r1,5100000259,Playoff 19.-20. place
+80/t410r1,5100000260,Playoff 21.-24. place 1/2
+80/t410r2,5100000261,Playoff 21.-24. place Final
+80/t411r1,5100000262,Playoff 23.-24. place
+80/t412r1,5100000263,Playoff Cerību kauss 1/2
+80/t412r2,5100000264,Playoff Cerību kauss Final
+94/g465,5100000265,Basic groups
+94/t436r1,5100000266,Playoff 1/4
+94/t436r2,5100000267,Playoff 1/2
+94/t436r3,5100000268,Playoff Final
+94/t437r1,5100000269,Playoff 3.-4. place
+95/g464,5100000270,Basic groups
+95/t440r1,5100000271,Playoff 1/4
+95/t440r2,5100000272,Playoff 1/2
+95/t440r3,5100000273,Playoff Final
+95/t441r1,5100000274,Playoff 3.-4. place
+128/g538,5100000275,Basic groups PRO
+128/t458r1,5100000276,Playoff 1/4
+128/t458r2,5100000277,Playoff 1/2
+128/t458r3,5100000278,Playoff Final
+128/t459r1,5100000279,Playoff 3.-4. place
+128/t460r1,5100000280,Playoff 5.-8. place 1/2
+128/t460r2,5100000281,Playoff 5.-8. place Final
+128/t461r1,5100000282,Playoff 7.-8. place
+128/g542,5100000283,Final groups 9.-13. place Par 9.vietu
+129/g540,5100000284,Basic groups Amatieri
+129/t455r1,5100000285,Playoff 1/4
+129/t455r2,5100000286,Playoff 1/2
+129/t455r3,5100000287,Playoff Final
+129/t456r1,5100000288,Playoff 3.-4. place
+129/t457r1,5100000289,Playoff 5.-6. place
