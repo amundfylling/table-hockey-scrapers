@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gzip
 import logging
 import re
 import time
@@ -107,17 +108,31 @@ class PoliteClient:
             raise AccessDenied(f"{url} -> {resp.status_code}")
         return resp
 
-    def get_bytes(self, url: str, cache_path: Path | None = None, refresh: bool = False) -> bytes | None:
-        """Fetch a URL, caching the body at ``cache_path``. Returns None on 404."""
+    def get_bytes(self, url: str, cache_path: Path | None = None, refresh: bool = False,
+                  offline: bool = False) -> bytes | None:
+        """Fetch a URL, caching the body at ``cache_path`` (gzip-compressed if it ends in ``.gz``).
+
+        Returns None on 404 (a 404 is cached as an empty file so it is not re-fetched), or when ``offline`` and
+        nothing is cached.
+        """
         if cache_path is not None and cache_path.exists() and not refresh:
-            return cache_path.read_bytes()
+            data = cache_path.read_bytes()
+            if not data:
+                return None
+            return gzip.decompress(data) if cache_path.suffix == ".gz" else data
+        if offline:
+            return None
         resp = self.get(url)
         if resp.status_code == 404:
+            if cache_path is not None:
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
+                cache_path.write_bytes(b"")
             return None
         resp.raise_for_status()
         if cache_path is not None:
             cache_path.parent.mkdir(parents=True, exist_ok=True)
-            cache_path.write_bytes(resp.content)
+            body = gzip.compress(resp.content, mtime=0) if cache_path.suffix == ".gz" else resp.content
+            cache_path.write_bytes(body)
         return resp.content
 
 

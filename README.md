@@ -21,7 +21,7 @@ Parquet file per source in exactly the schema of
 |---|---|
 | Shared layer (`scrapers/common/`): HTTP client, id mapper, registries, schema writer, duplicate check | done, tested |
 | `python -m scrapers.all`, nightly workflow | done |
-| `trefik` | **not written yet**: the build environment's network policy blocked stiga.trefik.cz |
+| `trefik` | done: 360 events 2000–2026, ~302k games (see "stiga.trefik.cz" below) |
 | `galdahokejs` | **not written yet**: galdahokejs.lv blocked (needs the shared Trefik SW parser from `trefik`) |
 | `escore` | **not written yet**: escore.live blocked |
 | `finland` | **not written yet**: tulos.poytajaakiekko.fi blocked; access question still open (below) |
@@ -123,7 +123,37 @@ write endpoints; a 401/403 raises `AccessDenied` and is never worked around.
   still has to be checked how the public result pages load their data before deciding whether access must be
   requested.
 
+## stiga.trefik.cz
+
+- **Discovery:** `stolni-hokej.cz/pohar.html` (re-read every run) lists every season. Season statistics (`data`,
+  `data_new`, `ted20xx`) are ignored. National championships are split into one tournament per category: from the
+  index row (2023+), `kategorie.aspx` (2018–2022) or the old hub pages (`index.htm` with "Turnaj jednotlivců /
+  žen / juniorů / veteránů", 2000–2017). Name: `Czech Cup <place> <year>`, `Czech Open <year>`,
+  `Moravia Open <year>`, `Czech Championship <year> – <category>`.
+- **Pages:** from the tournament page every result page in the same folder is followed (`kriz*`, `*cross*`,
+  `*umisteni*`, `*playoff*`, `*_list*`, `*_wr*`, `*ranking*`). Identical cross-tables shown on several pages are read
+  once. The 2026 events use a JSON file (`<tour>/m-<src>.json`) behind `ranking.html`, read directly.
+- **Games:** cross-table cells above the diagonal (each game once; "8:1 + 7:1" = two games), play-off series one row
+  per game ("P" = overtime → `Overtime = Yes`). Cells marked "K" are skipped: in final groups they are results
+  carried over from the basic group, in the play-off they are walkovers.
+- **Names:** cross-tables print short labels ("Kr Lebl", "L.Turoň", "ml Chylík"). They are matched to the event's
+  full names (final table, round tables, play-off and participants pages); a name already placed in another group of
+  the same phase is excluded, and pages without any full names fall back to every name seen on the site within ±3
+  seasons. Only unique matches are used.
+- **Ids:** Trefik `idpl` comes from player links (final table, play-off pages, participants list, the 2026 JSON) and
+  is carried to unlinked events by unique full-name match. ITHF ids come from the participants/WR lists
+  (`ithf/ranking/player.aspx?ID=`) and the 2026 JSON (`wr_id`), else a unique `ranking.txt` name match (CZE preferred).
+- **Checked:** every game of Patrik Petr at Němčice 2023 (38) and of Rainers Kalniņš at Czech Open 2023 (58) equals
+  their `thstats/overview_b.aspx` pages (tests/trefik).
+
 ## Known gaps
+
+- **trefik:** season 1998/99 (`cz_turnaje/99/…`) is linked from the index but every page is 404. Team championships
+  (`mrdr`, "Turnaj družstev") are skipped: their pages are team tables, not individual games with both players.
+  ~1,100 group games (0.4%) are left out because a short label fits two players of the same event (e.g. two
+  "J.Sládek", "A./m.Šrajer"); each case is listed in the run report. `turnaje2010/mr` only links the individual
+  event from the index (the other 2010 categories are not reached). Round numbers are only known where the page has
+  round tables (most events from ~2016); older group games have `RoundNumber` null.
 
 To be filled in per source as each one is built (team events, old seasons without ids, Google Sheets results on
 galdahokejs.lv, etc.).
