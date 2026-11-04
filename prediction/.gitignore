@@ -1,0 +1,3 @@
+*.parquet
+lgbm_model.txt
+train_full.log

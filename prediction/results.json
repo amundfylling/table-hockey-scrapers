@@ -1,0 +1,141 @@
+{
+ "results": [
+  {
+   "model": "constant (W/L 50-50, train draw rate)",
+   "log_loss": 0.9554406632321916,
+   "accuracy": 0.5092368723738879,
+   "brier": 0.5880479372800352,
+   "rps": 0.2472785917174414,
+   "n": 553813
+  },
+  {
+   "model": "site Glicko-2 + H2H (as published)",
+   "log_loss": 0.7571865320205688,
+   "accuracy": 0.6799894549243156,
+   "brier": 0.4363353246540667,
+   "rps": 0.17208151842156744,
+   "n": 553813
+  },
+  {
+   "model": "Elo K=24, refit draw model",
+   "log_loss": 0.7752763896272941,
+   "accuracy": 0.6708401572371901,
+   "brier": 0.44793580149661255,
+   "rps": 0.17773080024091972,
+   "n": 553813
+  },
+  {
+   "model": "goal-difference Elo, refit draw model",
+   "log_loss": 0.7727001081964993,
+   "accuracy": 0.6733608636850344,
+   "brier": 0.44600881201536857,
+   "rps": 0.17676309996319037,
+   "n": 553813
+  },
+  {
+   "model": "site Glicko-2 + H2H, refit draw model",
+   "log_loss": 0.7571796241163576,
+   "accuracy": 0.6799894549243156,
+   "brier": 0.43634479854298736,
+   "rps": 0.17208548044215058,
+   "n": 553813
+  },
+  {
+   "model": "logistic regression on ratings + form",
+   "log_loss": 0.7561611533164978,
+   "accuracy": 0.6802512761527808,
+   "brier": 0.4357589716984043,
+   "rps": 0.17180267214035358,
+   "n": 553813
+  },
+  {
+   "model": "site Glicko-2 + H2H, context-aware calibration (GBM on site_z + context)",
+   "log_loss": 0.72859069001713,
+   "accuracy": 0.6800851550974788,
+   "brier": 0.4303727340962459,
+   "rps": 0.17106488958973157,
+   "n": 553813,
+   "iterations": 136
+  },
+  {
+   "model": "LightGBM, all features except context",
+   "log_loss": 0.732165686958584,
+   "accuracy": 0.6840973397157525,
+   "brier": 0.42669670973294926,
+   "rps": 0.16871005332696845,
+   "n": 553813,
+   "iterations": 377
+  },
+  {
+   "model": "LightGBM, all features",
+   "log_loss": 0.7186405471164937,
+   "accuracy": 0.6840576151155715,
+   "brier": 0.4242815553773979,
+   "rps": 0.1682629876701103,
+   "n": 553813,
+   "iterations": 331
+  }
+ ],
+ "importance": {
+  "site_z": 3381264.3,
+  "site_pw": 2249805.1,
+  "site_pd": 1184417.0,
+  "playoff": 439528.5,
+  "site_x": 146334.3,
+  "po_game": 137493.6,
+  "poi_pd": 67993.3,
+  "d_elo": 59377.4,
+  "lam_ratio": 44763.3,
+  "d_form_long": 41600.8,
+  "h2h_days": 39911.0,
+  "d_g_mu": 38359.3,
+  "upset_rate_a": 32817.8,
+  "upset_rate_b": 31699.0,
+  "d_t_gd": 31400.4,
+  "d_gd_rate": 31201.8,
+  "t_games_b": 31049.4,
+  "t_games_a": 30773.5,
+  "poi_pw": 29852.2,
+  "h2h_n": 29789.4,
+  "src": 27266.6,
+  "h2h_gd": 27074.4,
+  "base_goals": 25375.5,
+  "year": 25295.7,
+  "d_t_resid": 23848.0,
+  "form_short_b": 23119.2,
+  "t_resid_a": 22944.7,
+  "g_sigma_a": 22806.7,
+  "form_short_a": 22246.4,
+  "t_resid_b": 21709.9,
+  "site_edge": 21692.4,
+  "t_gd_b": 21650.8,
+  "t_gd_a": 21618.5,
+  "g_sigma_b": 21369.9,
+  "draw_rate_b": 20986.5,
+  "draw_rate_a": 20501.9,
+  "goals_rate_a": 19300.3,
+  "goals_rate_b": 19176.4,
+  "form_long_a": 18825.6,
+  "h2h_ewm": 18765.0
+ },
+ "params": {
+  "objective": "multiclass",
+  "num_class": 3,
+  "learning_rate": 0.05,
+  "num_leaves": 127,
+  "min_data_in_leaf": 400,
+  "feature_fraction": 0.7,
+  "bagging_fraction": 0.8,
+  "bagging_freq": 1,
+  "lambda_l2": 10.0,
+  "verbose": -1,
+  "num_threads": 4
+ },
+ "splits": {
+  "train_from": "2005-01-01",
+  "valid_from": "2021-01-01",
+  "test_from": "2022-01-01",
+  "quick": false,
+  "out": "results.json"
+ }
+}
