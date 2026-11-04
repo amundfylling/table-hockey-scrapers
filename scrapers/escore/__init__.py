@@ -315,7 +315,34 @@ class Resolver:
         if ithf is None:
             ithf = self.mapper.match_ranking(name, nation=nation, source_key=key)
         sc = None if ithf else self.mapper.match_sportscorpion(name, nation, source_key=key)
-        return self.mapper.resolve(key, ithf=ithf, local_id=LOCAL_BASE + pid, sc_player_id=sc)
+        return self.mapper.resolve(key, ithf=ithf, local_id=LOCAL_BASE + pid, sc_player_id=sc, name=name,
+                                   nation=nation)
+
+
+def to_rows(events: list[tuple], resolver: Resolver, s_reg: IdRegistry) -> list[dict]:
+    rows = []
+    for eid, name, start, players, games in events:
+        resolver.mapper.begin_tournament(TOURNAMENT_BASE + eid)
+        ids = {pid: resolver.resolve(p) for pid, p in players.items()}
+        url = f"{BASE}/events/{eid}/particiants"
+        for g in games:
+            st = g["stage"]
+            stage_key = f"{eid}/{st['key']}"
+            net_url = f"{BASE}/events/{eid}/net/{g['net_id']}"
+            resolver.mapper.played(ids[g["p1"]], ids[g["p2"]])
+            if ids[g["p1"]] == ids[g["p2"]]:
+                continue
+            rows.append({
+                "StageID": s_reg.get(stage_key, name=st["name"]), "Player1": player_name(players[g["p1"]]),
+                "Player1ID": ids[g["p1"]], "Player2": player_name(players[g["p2"]]), "Player2ID": ids[g["p2"]],
+                "GoalsPlayer1": g["g1"], "GoalsPlayer2": g["g2"], "Overtime": "Yes" if g["ot"] else "No",
+                "Stage": st["name"], "RoundNumber": g["round"], "PlayoffGameNumber": g["game_no"],
+                "Date": start, "TournamentName": name, "TournamentID": TOURNAMENT_BASE + eid,
+                "StageSequence": st["seq"], "StageType": st["type"], "TournamentURL": url, "ResultURL": net_url,
+                "StageURL": net_url, "SourceURL": net_url, "Source": SOURCE, "SourceTournamentID": str(eid),
+                "SourceStageID": stage_key, "SourceMatchID": f"{eid}/{g['game_id']}/{g['set']}",
+            })
+    return rows
 
 
 def crawl(ctx: RunContext, skips: SkipCounter) -> list[tuple[int, dict, list[dict]]]:
@@ -356,7 +383,7 @@ def run(ctx: RunContext) -> pd.DataFrame:
     s_reg = IdRegistry(sdir / "stage_ids.csv", STAGE_BASE + 1, ("name",))
     mapper = PlayerMapper(ctx.ref, "escore")
     resolver = Resolver(mapper)
-    rows = []
+    kept = []
     for eid, props, nets in events:
         ev = props["competitionEvent"]
         name, start = event_name(ev, props.get("otherEvents")), str(ev.get("start_date"))[:10]
@@ -369,24 +396,11 @@ def run(ctx: RunContext) -> pd.DataFrame:
             log.info("skip %s %s: on table-hockey.eu as %s", start, name, dup[0][0])
             continue
         players = {p["player_id"]: p for p in props.get("participants") or [] if p.get("player_id")}
-        ids = {pid: resolver.resolve(p) for pid, p in players.items()}
-        url = f"{BASE}/events/{eid}/particiants"
-        for g in event_games(eid, props, nets, skips):
-            st = g["stage"]
-            stage_key = f"{eid}/{st['key']}"
-            net_url = f"{BASE}/events/{eid}/net/{g['net_id']}"
-            if ids[g["p1"]] == ids[g["p2"]]:
-                continue
-            rows.append({
-                "StageID": s_reg.get(stage_key, name=st["name"]), "Player1": player_name(players[g["p1"]]),
-                "Player1ID": ids[g["p1"]], "Player2": player_name(players[g["p2"]]), "Player2ID": ids[g["p2"]],
-                "GoalsPlayer1": g["g1"], "GoalsPlayer2": g["g2"], "Overtime": "Yes" if g["ot"] else "No",
-                "Stage": st["name"], "RoundNumber": g["round"], "PlayoffGameNumber": g["game_no"],
-                "Date": start, "TournamentName": name, "TournamentID": TOURNAMENT_BASE + eid,
-                "StageSequence": st["seq"], "StageType": st["type"], "TournamentURL": url, "ResultURL": net_url,
-                "StageURL": net_url, "SourceURL": net_url, "Source": SOURCE, "SourceTournamentID": str(eid),
-                "SourceStageID": stage_key, "SourceMatchID": f"{eid}/{g['game_id']}/{g['set']}",
-            })
+        kept.append((eid, name, start, players, list(event_games(eid, props, nets, skips))))
+    for _ in range(5):  # rebuilt while the "played each other" guard refuses name-based ids
+        rows = to_rows(kept, resolver, s_reg)
+        if not mapper.apply_guard():
+            break
     df = to_frame(rows)
     write_parquet(df, ctx.data_dir / OUTPUT)
     s_reg.save()

@@ -25,8 +25,8 @@ def test_ithf_to_sportscorpion_and_synthetic():
     assert m.resolve("c", local_id=50_000_003) == 50_000_003
     # duplicated RankingID in players_data.csv -> lowest PlayerID
     assert m.resolve("d", ithf=660637, local_id=1) == 1507
-    assert m.stats() == {"ithf_sportscorpion": 2, "ithf_synthetic": 1, "sportscorpion_name": 0,
-                         "source_local": 1, "total": 4}
+    assert m.stats() == {"ithf_sportscorpion": 2, "ithf_name_sportscorpion": 0, "ithf_synthetic": 1,
+                         "sportscorpion_name": 0, "source_local": 1, "total": 4}
 
 
 def test_ranking_name_match_is_unique_and_nation_aware():

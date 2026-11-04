@@ -17,6 +17,7 @@ import traceback
 import pandas as pd
 
 from .common.context import add_common_args, build_context
+from .common import id_report
 from .common.dedupe import check_and_report
 from .common.schema import COLUMNS, to_frame, write_parquet
 
@@ -55,6 +56,7 @@ def main() -> int:
     df = combine(ctx.data_dir)
     write_parquet(df, ctx.data_dir / "all_results.parquet")
     check_and_report(df, ctx.data_dir / "duplicate_check.csv")
+    id_report.write(ctx.data_dir, ORDER, ctx.ref)
     if failed:
         print(f"\nFailed sources: {', '.join(failed)}")
         return 1

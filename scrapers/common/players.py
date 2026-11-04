@@ -1,12 +1,19 @@
 """Player id mapping shared by all sources, so one person gets the same id everywhere.
 
 1. Known ITHF id that matches a Sportscorpion ``RankingID`` -> that ``PlayerID``.
-2. Any other known ITHF id -> ``9_000_000 + ithfId`` (same rule as table-hockey-eu-fetch).
-3. Otherwise a source-local synthetic id in the source's own range.
+2. Known ITHF id that Sportscorpion lacks, but Sportscorpion has the same name (unique, same nation) under a
+   PlayerID with an empty or different RankingID -> that ``PlayerID`` ("ithf_name_sportscorpion").
+3. Any other known ITHF id -> ``9_000_000 + ithfId`` (same rule as table-hockey-eu-fetch).
+4. No ITHF id, but a unique Sportscorpion name match (same nation when both sides have one) -> that
+   ``PlayerID`` ("sportscorpion_name").
+5. Otherwise a source-local synthetic id in the source's own range.
 
 ITHF ids come from the source itself or, where a source asks for it, from a *unique* name match
-against the ITHF ranking (``ranking.txt``). Some sources may also fall back to a unique exact name match
-against Sportscorpion's ``players_data.csv``. Every name decision is logged for review.
+against the ITHF ranking (``ranking.txt``). Every name decision is logged for review.
+
+Guard: a name-based Sportscorpion id is dropped for a player when, in the same tournament, a different
+player of the source has that id and the two play each other (they are two people). Sources call
+``begin_tournament`` / ``played`` while building rows and rebuild them when ``apply_guard`` returns True.
 """
 
 from __future__ import annotations
@@ -37,6 +44,22 @@ COUNTRY_NAMES: dict[str, str] = {
     "CHE": "Switzerland", "HUN": "Hungary", "AUT": "Austria", "USA": "United States of America",
     "CAN": "Canada", "POR": "Portugal", "PRT": "Portugal", "POL": "Poland", "FRA": "France",
 }
+# Country strings in players_data.csv (free text, some in Russian or misspelt) -> ITHF code(s).
+_SC_COUNTRY_CODES: dict[str, tuple[str, ...]] = {
+    "russia": ("RUS",), "россия": ("RUS",), "росиия": ("RUS",), "latvia": ("LAT",), "латвия": ("LAT",),
+    "norway": ("NOR",), "ukraine": ("UKR",), "kazakhstan": ("KAZ",), "казакстан": ("KAZ",), "kazakistan": ("KAZ",),
+    "estonia": ("EST",), "belarus": ("BLR",), "sweden": ("SWE",), "germany": ("GER",),
+    "czech republic": ("CZE",), "czechia": ("CZE",), "slovakia": ("SVK",), "finland": ("FIN",),
+    "slovenia": ("SLO",), "denmark": ("DEN",), "united states of america": ("USA",),
+    "republic of lithuania": ("LTU",), "lithuania": ("LTU",), "switzerland": ("SUI",), "portugal": ("POR",),
+    "hungary": ("HUN",), "tajikistan": ("TJK",), "israel": ("ISR",), "canada": ("CAN",), "syria": ("SYR",),
+    "china": ("CHN",), "turkmenistan": ("TKM",), "kyrgyzstan": ("KGZ",), "serbia": ("SRB",), "france": ("FRA",),
+    "india": ("IND",), "pakistan": ("PAK",), "spain": ("ESP",), "uzbekistan": ("UZB",), "austria": ("AUT",),
+    "azerbaijan": ("AZE",), "chile": ("CHI",), "united kingdom": ("GBR",), "australia": ("AUS",),
+    "italy": ("ITA",), "poland": ("POL",), "netherlands": ("NED",), "armenia": ("ARM",), "iran": ("IRN",),
+    "republic of moldova": ("MDA",), "sverige": ("SWE",),
+}
+_NO_COUNTRY = {"", "-", "test"}
 # ISO alpha-3 codes that differ from the ITHF code used in ranking.txt.
 ISO_TO_ITHF = {"LVA": "LAT", "DEU": "GER", "SVN": "SLO", "DNK": "DEN", "CHE": "SUI", "PRT": "POR"}
 
@@ -79,6 +102,21 @@ def ithf_nation(code: str | None) -> str | None:
     return ISO_TO_ITHF.get(code, code) or None
 
 
+def sc_country_codes(country: str | None) -> frozenset[str] | None:
+    """ITHF code(s) for a players_data.csv ``Country``; None when blank. "Sweden / Portugal" -> {SWE, POR}.
+    A country we have no code for becomes ``{"?<name>"}``: it is a nation, but matches no source nation."""
+    text = (country or "").strip().lower()
+    if text in _NO_COUNTRY:
+        return None
+    codes: set[str] = set()
+    for part in re.split(r"\s*[/,]\s*|\s+-\s+", text):
+        part = part.strip()
+        if part in _NO_COUNTRY:
+            continue
+        codes.update(_SC_COUNTRY_CODES.get(part, (f"?{part}",)))
+    return frozenset(codes) or None
+
+
 # --------------------------------------------------------------------------------------------------
 # Reference data (loaded once per run, shared by all sources)
 # --------------------------------------------------------------------------------------------------
@@ -92,6 +130,14 @@ class ReferenceData:
     # name key -> list of (ithf id, nation, name) from ranking.txt
     ranking_by_name: dict[frozenset, list[tuple[int, str, str]]]
     ranking_available: bool = True
+    # ithf id -> (nation, name) from ranking.txt
+    ranking_by_id: dict[int, tuple[str, str]] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.ranking_by_id:
+            for cands in self.ranking_by_name.values():
+                for ithf, nation, name in cands:
+                    self.ranking_by_id.setdefault(ithf, (nation, name))
 
 
 def _read_text(source: str, client=None) -> str:
@@ -162,6 +208,9 @@ def load_reference(players_csv: str = PLAYERS_CSV_URL, ranking: str | None = RAN
 # --------------------------------------------------------------------------------------------------
 
 NAME_MATCH_FIELDS = ["source_key", "source_name", "nation", "method", "result_id", "matched_name", "candidates"]
+NAME_METHODS = ("ithf_name_sportscorpion", "sportscorpion_name")
+STAT_METHODS = ("ithf_sportscorpion", "ithf_name_sportscorpion", "sportscorpion_name", "ithf_synthetic",
+                "source_local")
 
 
 @dataclass
@@ -170,7 +219,13 @@ class PlayerMapper:
     source: str
     # unique players seen (by source key) -> method
     seen: dict[str, str] = field(default_factory=dict)
-    name_log: dict[str, dict] = field(default_factory=dict)
+    name_log: dict[tuple[str, str], dict] = field(default_factory=dict)
+    # (source key, Sportscorpion PlayerID) pairs refused by the "played each other" guard
+    blocked: set[tuple[str, int]] = field(default_factory=set)
+    _tournament: object = None
+    _keys_by_pid: dict = field(default_factory=lambda: defaultdict(set))  # (tournament, pid) -> source keys
+    _name_based: dict = field(default_factory=dict)  # (tournament, pid) -> source keys mapped by name
+    _new_blocks: int = 0
 
     # -- name matching -----------------------------------------------------------------------
     def match_ranking(self, name: str, nation: str | None = None, prefer_nation: str | None = None,
@@ -191,58 +246,133 @@ class PlayerMapper:
                   cands[0][2] if result else "", cands)
         return result
 
-    def match_sportscorpion(self, name: str, country_code: str | None = None,
-                            source_key: str | None = None) -> int | None:
-        """Unique Sportscorpion PlayerID with exactly this folded name (and country, if given)."""
+    def sportscorpion_candidates(self, name: str, nation: str | None = None) -> list[tuple]:
+        """players_data.csv rows with the same folded, order-free name whose country does not contradict
+        ``nation`` (a row without a country is kept, so it still counts against uniqueness)."""
         cands = self.ref.sc_by_name.get(name_key(name), [])
-        country = COUNTRY_NAMES.get(ithf_nation(country_code) or "", None) if country_code else None
-        if country:
-            cands = [c for c in cands if c[1] == country]
+        nation = ithf_nation(nation)
+        if not nation:
+            return list(cands)
+        return [c for c in cands if (codes := sc_country_codes(c[1])) is None or nation in codes]
+
+    def match_sportscorpion(self, name: str, country_code: str | None = None,
+                            source_key: str | None = None, method: str = "players_data.csv",
+                            ithf: int | None = None) -> int | None:
+        """Unique Sportscorpion PlayerID for this name (folded, any word order). When ``country_code`` is given
+        the country must match wherever players_data.csv has one; otherwise the name must be unique overall.
+        With ``ithf`` (an ITHF id Sportscorpion does not know), a candidate whose RankingID is a ranking.txt
+        player with another name is not used."""
+        key = source_key or name
+        cands = self.sportscorpion_candidates(name, country_code)
+        if ithf is not None:
+            cands = [c for c in cands if c[3] is None or c[3] == ithf
+                     or name_key(self.ref.ranking_by_id.get(c[3], ("", name))[1]) == name_key(name)]
         ids = {c[0] for c in cands}
         result = next(iter(ids)) if len(ids) == 1 else None
-        self._log(source_key or name, name, country_code, "players_data.csv", result,
-                  cands[0][2] if result else "", [(c[0], c[1], c[2]) for c in cands])
+        matched = cands[0][2] if result else ""
+        if result is not None and (key, result) in self.blocked:
+            matched, result = f"{matched} (refused: played each other)", None
+            cands = []
+        self._log(key, name, country_code, method, result, matched, [(c[0], c[1], c[2]) for c in cands],
+                  force=True)
         return result
 
-    def _log(self, key, name, nation, method, result, matched, cands) -> None:
-        entry = self.name_log.get(key)
-        # keep the first decisive match per key; overwrite non-matches with later matches
-        if entry and entry["result_id"] and not result:
+    def _log(self, key, name, nation, method, result, matched, cands, force: bool = False) -> None:
+        entry = self.name_log.get((key, method))
+        # keep the first decisive match per key and method; overwrite non-matches with later matches
+        if entry and entry["result_id"] and not result and not force:
             return
-        self.name_log[key] = {
+        self.name_log[(key, method)] = {
             "source_key": key, "source_name": name, "nation": nation or "", "method": method,
             "result_id": "" if result is None else str(result), "matched_name": matched,
             "candidates": "|".join(f"{c[0]}:{c[2]}:{c[1]}" for c in cands[:5]) if len(cands) != 1 or not result else "",
         }
 
     # -- id resolution -----------------------------------------------------------------------
-    def from_ithf(self, ithf: int) -> tuple[int, str]:
+    def from_ithf(self, ithf: int, name: str | None = None, nation: str | None = None,
+                  source_key: str | None = None) -> tuple[int, str]:
         if ithf in self.ref.ithf_to_player:
             return self.ref.ithf_to_player[ithf], "ithf_sportscorpion"
+        if name:
+            ranking = self.ref.ranking_by_id.get(ithf)
+            nat = ithf_nation(nation) or (ranking[0] if ranking and ranking[0] else None)
+            pid = self.match_sportscorpion(name, nat, source_key or f"ithf:{ithf}",
+                                           method="ithf_name_sportscorpion", ithf=ithf)
+            if pid is None and ranking and name_key(ranking[1]) != name_key(name):
+                pid = self.match_sportscorpion(ranking[1], nat, source_key or f"ithf:{ithf}",
+                                               method="ithf_name_sportscorpion", ithf=ithf)
+            if pid is not None:
+                return pid, "ithf_name_sportscorpion"
         return ITHF_OFFSET + ithf, "ithf_synthetic"
 
-    def resolve(self, source_key: str, *, ithf=None, local_id: int, sc_player_id: int | None = None) -> int:
-        """Final id for one player. ``sc_player_id`` is a direct Sportscorpion name match (no ITHF id)."""
+    def resolve(self, source_key: str, *, ithf=None, local_id: int, sc_player_id: int | None = None,
+                name: str | None = None, nation: str | None = None) -> int:
+        """Final id for one player. ``sc_player_id`` is a direct Sportscorpion name match (no ITHF id); ``name``
+        and ``nation`` let a known ITHF id that Sportscorpion lacks fall back to a Sportscorpion name match."""
+        key = str(source_key)
         ithf = to_int(ithf)
         if ithf is not None:
-            pid, method = self.from_ithf(ithf)
-        elif sc_player_id is not None:
+            pid, method = self.from_ithf(ithf, name, nation, key)
+        elif sc_player_id is not None and (key, sc_player_id) not in self.blocked:
             pid, method = sc_player_id, "sportscorpion_name"
         else:
             pid, method = local_id, "source_local"
-        self.seen[str(source_key)] = method
+        self.seen[key] = method
+        if self._tournament is not None:
+            self._keys_by_pid[(self._tournament, pid)].add(key)
+            if method in NAME_METHODS:
+                self._name_based.setdefault((self._tournament, pid), set()).add(key)
         return pid
+
+    # -- "played each other" guard -------------------------------------------------------------
+    def begin_tournament(self, tournament) -> None:
+        """Ids resolved from now on belong to ``tournament`` (until the next call)."""
+        self._tournament = tournament
+
+    def played(self, pid1: int, pid2: int) -> None:
+        """Record one game. Two different source players with the same id who play each other are two people:
+        every name-based mapping to that id in this tournament is refused (applied by ``apply_guard``)."""
+        if pid1 != pid2 or self._tournament is None:
+            return
+        slot = (self._tournament, pid1)
+        if len(self._keys_by_pid.get(slot, ())) < 2:
+            return
+        for key in sorted(self._name_based.get(slot, ())):
+            if (key, pid1) not in self.blocked:
+                self.blocked.add((key, pid1))
+                self._new_blocks += 1
+                others = sorted(self._keys_by_pid[slot] - {key})
+                log.info("%s: %s not mapped to Sportscorpion %d: plays %s in %s", self.source, key, pid1,
+                         ", ".join(others), self._tournament)
+                self.name_log[(key, "rejected_played_each_other")] = {
+                    "source_key": key, "source_name": self._name_of(key), "nation": "",
+                    "method": "rejected_played_each_other", "result_id": "", "matched_name": str(pid1),
+                    "candidates": f"plays {'|'.join(others)} in tournament {self._tournament}",
+                }
+
+    def _name_of(self, key: str) -> str:
+        return next((e["source_name"] for (k, _), e in self.name_log.items() if k == key), "")
+
+    def apply_guard(self) -> bool:
+        """True when ``played`` refused new mappings since the last call: the caller rebuilds its rows (the
+        refused players then fall back to their ITHF synthetic or source-local id)."""
+        new, self._new_blocks = self._new_blocks, 0
+        self._tournament = None
+        self._keys_by_pid = defaultdict(set)
+        self._name_based = {}
+        if new:
+            self.seen = {}
+        return bool(new)
 
     def stats(self) -> dict[str, int]:
         counts = Counter(self.seen.values())
-        out = {m: counts.get(m, 0) for m in ("ithf_sportscorpion", "ithf_synthetic", "sportscorpion_name",
-                                             "source_local")}
+        out = {m: counts.get(m, 0) for m in STAT_METHODS}
         out["total"] = len(self.seen)
         return out
 
     def write_name_matches(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
-        rows = sorted(self.name_log.values(), key=lambda r: (r["source_name"], r["source_key"]))
+        rows = sorted(self.name_log.values(), key=lambda r: (r["source_name"], r["source_key"], r["method"]))
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.DictWriter(fh, NAME_MATCH_FIELDS, lineterminator="\n")
             writer.writeheader()

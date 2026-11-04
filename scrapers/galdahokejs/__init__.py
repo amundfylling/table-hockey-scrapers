@@ -258,18 +258,29 @@ class Resolver:
         ithf = self.mapper.match_ranking(display, prefer_nation="LAT", source_key=key)
         sc = None if ithf else self.mapper.match_sportscorpion(display, source_key=key)
         local = self.registry.get(key, name=name)
-        return self.mapper.resolve(key, ithf=ithf, local_id=local, sc_player_id=sc)
+        return self.mapper.resolve(key, ithf=ithf, local_id=local, sc_player_id=sc, name=display)
 
 
 def to_rows(events: list[Parsed], resolver: Resolver, t_reg: IdRegistry, s_reg: IdRegistry) -> list[dict]:
+    """Rows for every game. Rebuilt while the "played each other" guard refuses name-based ids."""
+    for _ in range(5):
+        rows = _to_rows(events, resolver, t_reg, s_reg)
+        if not resolver.mapper.apply_guard():
+            break
+    return rows
+
+
+def _to_rows(events: list[Parsed], resolver: Resolver, t_reg: IdRegistry, s_reg: IdRegistry) -> list[dict]:
     rows = []
     for t in events:
         tid = t_reg.get(t.url, name=t.name)
+        resolver.mapper.begin_tournament(tid)
         ids: dict[str, int] = {}
         for g in t.games:
             for n in (g.p1, g.p2):
                 if n not in ids:
                     ids[n] = resolver.resolve(n)
+            resolver.mapper.played(ids[g.p1], ids[g.p2])
             if ids[g.p1] == ids[g.p2]:
                 continue
             stage_key = f"{t.url}#{g.stage}"

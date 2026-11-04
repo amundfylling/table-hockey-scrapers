@@ -44,8 +44,9 @@ def print_report(source: str, df: pd.DataFrame, skips: SkipCounter, id_stats: di
     print("Player id mapping (unique players):")
     labels = {
         "ithf_sportscorpion": "via ITHF -> Sportscorpion",
+        "ithf_name_sportscorpion": "via ITHF id + name -> Sportscorpion",
+        "sportscorpion_name": "via name -> Sportscorpion",
         "ithf_synthetic": "via ITHF synthetic (9M + ithf)",
-        "sportscorpion_name": "via Sportscorpion name match",
         "source_local": "source-local",
     }
     for key, label in labels.items():
