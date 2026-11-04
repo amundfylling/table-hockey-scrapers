@@ -1,0 +1,35 @@
+name,n_ids,ids,details
+Honza Sládek,2,1310 2009,"1310 (sportscorpion, in players_data.csv, Czech Republic; as Sladek Honza) | 2009 (sportscorpion; trefik 3665; as Honza Sládek / Sládek Honza)"
+Miroslav Hubáček ml.,2,21000612 21001022,21000612 (local; trefik 2836; as Miroslav Hubáček ml.) | 21001022 (local; trefik 9; as ml. Hubáček Miroslav)
+Jelínek Josef,2,21000420 21000991,21000420 (local; trefik 2699; as Josef Jelínek) | 21000991 (local; trefik 9; as Jelínek Josef)
+Kraus Vojtěch,2,13909 16432,"13909 (sportscorpion; galdahokejs 12, trefik 1876; as Kraus Vojtěch / Vojtech Kraus / Vojtěch Kraus) | 16432 (sportscorpion, in players_data.csv, Czech Republic; as Vojtech Kraus)"
+Hudec Karol,3,1240 4137 9260046,"1240 (sportscorpion, in players_data.csv, Slovakia; as Hudec Karol) | 4137 (sportscorpion, in players_data.csv, Slovakia; as Hudec Karol) | 9260046 (ithf_synthetic; trefik 1825; as Karol Hudec)"
+Gergely Regula,3,1244 5438 10137,"1244 (sportscorpion, in players_data.csv, Hungary; as Gergely Regula) | 5438 (sportscorpion, in players_data.csv, Hungary; trefik 1238; as Gergely Regula) | 10137 (sportscorpion; trefik 34; as Regula Gergely)"
+Blasko Imrich,3,1233 15494 9260161,"1233 (sportscorpion, in players_data.csv, Slovakia; as Blasko Imrich) | 15494 (sportscorpion, in players_data.csv, Slovakia; as Imrich Blaško) | 9260161 (ithf_synthetic; trefik 1185; as Imrich Blaško)"
+Antonín Šrajer,2,21000332 21000987,21000332 (local; trefik 985; as Antonín Šrajer / Antonín šrajer) | 21000987 (local; trefik 19; as Šrajer Antonín)
+Raivis Miglinieks,2,8566 50000023,8566 (sportscorpion; trefik 271; as Raivis Miglinieks) | 50000023 (local; galdahokejs 376; as Raivis Miglinieks)
+Bernard Rjavec,2,1234 1251,"1234 (sportscorpion, in players_data.csv, Slovenia; galdahokejs 53, trefik 450; as Bernard Rjavec) | 1251 (sportscorpion; trefik 35; as Rjavec Bernard)"
+Braiens Gorsanovs,2,40000875 50000198,40000875 (local; escore 125; as Braiens Gorsanovs) | 50000198 (local; galdahokejs 401; as Braiens Goršanovs)
+Dietze Valentin,2,1621 1753,"1621 (sportscorpion, in players_data.csv, Germany; galdahokejs 38, trefik 334; as Valentin Dietze) | 1753 (sportscorpion; trefik 31; as Dietze Valentin)"
+Edgars Liepins,3,15217 15529 9676383,"15217 (sportscorpion, in players_data.csv, Latvia; as Edgars Liepiņš) | 15529 (sportscorpion, in players_data.csv, Latvia; as Edgars Liepins) | 9676383 (ithf_synthetic; escore 168, galdahokejs 173, trefik 33; as Edgars Liepins / Edgars Liepiņš)"
+Tina Gorsanova,2,40001484 50000299,40001484 (local; escore 116; as Tina Gorsanova) | 50000299 (local; galdahokejs 248; as Tīna Goršanova)
+Jakub Saj,2,21000115 21000176,21000115 (local; trefik 229; as Jakub Saj) | 21000176 (local; trefik 20; as Saj Jakub)
+Arseniy Stolyarov,2,46 1471,"46 (sportscorpion; trefik 239; as Arseniy Stolyarov / Stolyarov Arseniy) | 1471 (sportscorpion, in players_data.csv, Russia; as Arseniy Stolyarov)"
+Daniel Jerabek,2,16444 9674878,16444 (sportscorpion; trefik 126; as Daniel Jerabek) | 9674878 (ithf_synthetic; trefik 72; as Daniel Jerabek)
+Krejzlík Štěpán,2,21000116 21000175,21000116 (local; trefik 137; as Štěpán Krejzlík) | 21000175 (local; trefik 47; as Krejzlík Štěpán)
+Mykhailo Razkevich,2,14560 50000106,14560 (sportscorpion; trefik 114; as Mykhailo Razkevich) | 50000106 (local; galdahokejs 63; as Mykhailo Razkevich)
+Bobák Lászlo,2,21000749 21000932,21000749 (local; trefik 83; as László Bobák) | 21000932 (local; trefik 28; as Bobák Lászlo)
+Kraus Václav,2,21000122 21000180,21000122 (local; trefik 85; as Václav Kraus) | 21000180 (local; trefik 8; as Kraus Václav)
+Dmytro Kudrytsky,4,465 1933 21000844 50000234,"465 (sportscorpion, in players_data.csv, Ukraine; as Dmytro Kudrytsky) | 1933 (sportscorpion, in players_data.csv, Ukraine; as Dmytro Kudrytsky) | 21000844 (local; trefik 45; as Dmytro Kudrytsky) | 50000234 (local; galdahokejs 38; as Dmytro Kudrytsky)"
+Elina Gala,3,2005 12841 40000745,"2005 (sportscorpion, in players_data.csv, Latvia; as Elīna Gala) | 12841 (sportscorpion, in players_data.csv, Latvia; as Elina Gala) | 40000745 (local; escore 62; as Elina Gala)"
+Petr Vlach,2,21000196 21000990,21000196 (local; trefik 48; as Petr Vlach) | 21000990 (local; trefik 10; as Vlach Petr)
+Eike Rompa,3,1265 1613 50000266,"1265 (sportscorpion, in players_data.csv, Germany; as Rompa Eike) | 1613 (sportscorpion, in players_data.csv, Germany; as Eike Rompa) | 50000266 (local; galdahokejs 53; as Eike Rompa)"
+Antti Suojanen,3,1301 5434 21000368,"1301 (sportscorpion, in players_data.csv, Finland; as Suojanen Antti) | 5434 (sportscorpion, in players_data.csv, Finland; as Antti Suojanen) | 21000368 (local; trefik 44; as Antti Suojanen)"
+Igor Kashentsev,3,238 1567 21000893,"238 (sportscorpion, in players_data.csv, Russia; as Kashentsev Igor) | 1567 (sportscorpion, in players_data.csv, Russia; as Kashentsev Igor) | 21000893 (local; trefik 43; as Igor Kashentsev)"
+Artem Valiev,2,711 21000370,"711 (sportscorpion, in players_data.csv, Republic of Lithuania; as Artem Valiev) | 21000370 (local; trefik 40; as Artem Valiev)"
+Andersson Henric,3,1228 2923 9280021,"1228 (sportscorpion, in players_data.csv, Sweden; as Andersson Henric) | 2923 (sportscorpion, in players_data.csv; as Henric Andersson) | 9280021 (ithf_synthetic; trefik 38; as Henric Andersson)"
+Yevhen Rykun,3,1643 1982 21000606,"1643 (sportscorpion, in players_data.csv, Ukraine; as Yevhen Rykun) | 1982 (sportscorpion, in players_data.csv, Ukraine; as Yevhen Rykun) | 21000606 (local; trefik 34; as Yevhen Rykun)"
+Mykhailo Bibik,4,585 778 961 21000469,"585 (sportscorpion, in players_data.csv, Ukraine; as Mykhailo Bibik) | 778 (sportscorpion, in players_data.csv, Ukraine; as Mykhailo Bibik) | 961 (sportscorpion, in players_data.csv, Ukraine; as Mykhailo Bibik) | 21000469 (local; trefik 33; as Mykhailo Bibik)"
+Evgeniy Goloviznin,3,607 628 9655563,"607 (sportscorpion, in players_data.csv, Russia; as Evgeniy Goloviznin) | 628 (sportscorpion, in players_data.csv, Russia; as Evgeniy Goloviznin) | 9655563 (ithf_synthetic; trefik 32; as Evgeniy Goloviznin)"
+Vedernikov Vladimir,3,1369 5941 21000609,"1369 (sportscorpion, in players_data.csv, Germany; as Vladimir Vedernikov) | 5941 (sportscorpion, in players_data.csv, Germany; as Vedernikov Vladimir) | 21000609 (local; trefik 31; as Vladimir Vedernikov)"
+Hubáček Miroslav,2,21000986 21000988,21000986 (local; trefik 2; as Miroslav Hubáček) | 21000988 (local; trefik 2; as Hubáček Miroslav)

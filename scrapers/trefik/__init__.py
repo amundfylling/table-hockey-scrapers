@@ -416,17 +416,34 @@ class IdResolver:
             idpl = next(iter(cands)) if len(cands) == 1 else None
         ithf = ref.ithf or (self.idpl_to_ithf.get(idpl) if idpl else None)
         source_key = f"idpl:{idpl}" if idpl else f"name:{fold(ref.name)}"
+        display = sw.display_name(ref.name)
         if ithf is None:
-            ithf = self.mapper.match_ranking(sw.display_name(ref.name), nation=ref.nation, prefer_nation="CZE",
+            ithf = self.mapper.match_ranking(display, nation=ref.nation, prefer_nation="CZE",
                                              source_key=source_key)
+        sc = None
+        # several Trefik players (idpls) with this name: a name match could merge two people
+        if ithf is None and len(self.name_to_idpl.get(_pkey(ref.name), ())) <= 1:
+            sc = self.mapper.match_sportscorpion(display, ref.nation, source_key=source_key)
         local = IDPL_BASE + idpl if idpl else self.registry.get(fold(ref.name), name=ref.name)
-        return self.mapper.resolve(source_key, ithf=ithf, local_id=local)
+        return self.mapper.resolve(source_key, ithf=ithf, local_id=local, sc_player_id=sc, name=display,
+                                   nation=ref.nation)
 
 
 def to_rows(parsed: list[Parsed], resolver: IdResolver, t_reg: IdRegistry, s_reg: IdRegistry) -> list[dict]:
+    """Rows for every game. Rebuilt while the "played each other" guard refuses name-based ids."""
+    for _ in range(5):
+        rows = _to_rows(parsed, resolver, t_reg, s_reg)
+        if not resolver.mapper.apply_guard():
+            break
+    return rows
+
+
+def _to_rows(parsed: list[Parsed], resolver: IdResolver, t_reg: IdRegistry, s_reg: IdRegistry) -> list[dict]:
     rows = []
+    mapper = resolver.mapper
     for t in parsed:
         tid = t_reg.get(t.key, name=t.name)
+        mapper.begin_tournament(tid)
         ids: dict[str, int] = {}
         for g in t.games:
             for n in (g.p1, g.p2):
@@ -434,6 +451,7 @@ def to_rows(parsed: list[Parsed], resolver: IdResolver, t_reg: IdRegistry, s_reg
                     ids[n] = resolver.resolve(t.players.get(n) or PlayerRef(n))
             stage_key = f"{t.key}#{g.stage}"
             sid = s_reg.get(stage_key, name=g.stage)
+            mapper.played(ids[g.p1], ids[g.p2])
             if ids[g.p1] == ids[g.p2]:
                 continue
             rows.append({

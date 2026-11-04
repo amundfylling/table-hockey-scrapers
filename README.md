@@ -54,6 +54,7 @@ scrapers/common/schema.py      output schema, validation, deterministic sort, Pa
 scrapers/common/dedupe.py      cross-source duplicate tournament check
 scrapers/common/overlaps.py    Sportscorpion tournament list / table-hockey.eu Parquet for overlap skips
 scrapers/common/report.py      end-of-run report
+scrapers/common/id_report.py   names with more than one id across Sportscorpion and the Parquets
 scrapers/common/context.py     reference data loaded once per run and shared by all sources
 scrapers/<source>/             one module per source, `python -m scrapers.<source>`
 scrapers/all.py                `python -m scrapers.all`
@@ -81,14 +82,29 @@ downloaded once per run (`data/_shared/`, not committed) and shared by every sou
 
 1. Known ITHF id that matches a `RankingID` in `players_data.csv`: that `PlayerID` (lowest one if a RankingID is
    duplicated, as in table-hockey-eu-fetch).
-2. Any other known ITHF id: `9_000_000 + ithfId`.
-3. Otherwise a source-local id (ranges below), stable across runs.
+2. Known ITHF id that `players_data.csv` lacks, but the same name (and nation: the source's, else ranking.txt's)
+   is there exactly once under a PlayerID with an empty or different RankingID: that `PlayerID`
+   (`ithf_name_sportscorpion`; a candidate whose RankingID belongs to someone else in ranking.txt is not used).
+3. Any other known ITHF id: `9_000_000 + ithfId`.
+4. No ITHF id, but a unique name match in `players_data.csv`: that `PlayerID` (`sportscorpion_name`; all sources;
+   Trefik only when no other Trefik player has that name).
+5. Otherwise a source-local id (ranges below), stable across runs. Local ids stay in the registries even when a
+   player stops using them; they are never renumbered or reused.
 
-Name matching (where a source needs it) folds diacritics, lowercases and compares the *set* of name tokens
-("Plešák Pavel" = "Pavel Plesak"), requires the same nation when the source gives one, and only accepts a
-unique match. Every decision goes to `data/<source>/name_matches.csv`. The mapping is re-run every run, so a
-player who later gets an ITHF id or appears on Sportscorpion switches to the real id. The report prints how
-many players were mapped by each route.
+Name matching folds diacritics, lowercases and compares the *set* of name tokens ("Plešák Pavel" =
+"Pavel Plesak"), and only accepts a unique match. When both sides have a nation it must match; a
+`players_data.csv` row without a country still counts against uniqueness. Every decision goes to
+`data/<source>/name_matches.csv` (column `method`). The mapping is re-run every run, so a player who later gets an
+ITHF id or appears on Sportscorpion switches to the real id. The report prints how many players were mapped by
+each route.
+
+**Guard:** if a name-based Sportscorpion id would put the same id on both sides of a game (two different source
+players who play each other in one tournament), that name match is refused for the player, the rows are rebuilt,
+and the decision is logged as `rejected_played_each_other`.
+
+`python -m scrapers.all` also writes `data/player_id_report.csv`: names (folded, any word order) that still have
+more than one id across `players_data.csv` and the Parquets, with game counts per source, for manual merging in
+the site's `aliases.json`.
 
 | Source | TournamentID | StageID | Local player ids |
 |---|---|---|---|
