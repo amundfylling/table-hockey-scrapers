@@ -124,8 +124,10 @@ def tournament_city(item: Listed, title: str) -> str | None:
     "MR, Turnov", or the Czech Cup town."""
     for text in (item.label, item.row_label):
         if text and "," in text:
-            town = text.split(",", 1)[1].strip()
-            if town and town != "MO" and not parse_date_only(town):
+            first, town = (x.strip() for x in text.split(",", 1))
+            if town == "MO":  # "Olomouc, MO" = Moravia Open in Olomouc
+                return first or None
+            if town and not parse_date_only(town):
                 return town
     head = (title or "").split(",", 1)[0]
     if " - " in head:  # "Czech Open - Praha, 25. duben 2009"
@@ -387,8 +389,10 @@ def parse_json_event(fetcher: Fetcher, item: Listed, skips: SkipCounter, refresh
         skips.skip("tournament without a date", item.key)
         return None
     title = data.get("tourn", {}).get("where", item.label)
+    where = data.get("tourn", {}).get("where") or ""
     parsed = Parsed(item.key, tournament_name(item, title, when), when.isoformat(), item.url,
-                    city=tournament_city(item, title))
+                    city=tournament_city(item, title) if item.category is None else (
+                        _title_place(where) if not sw.ascii_fold(where).startswith(("mr", "czech")) else None))
     by_id: dict[int, str] = {}
     for p in data.get("players", []):
         name = p["name"]

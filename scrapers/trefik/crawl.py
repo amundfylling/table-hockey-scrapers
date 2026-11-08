@@ -8,7 +8,7 @@ from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
 from ..common.http import AccessDenied, PoliteClient
-from .discover import BASE, INDEX_URL, Listed, decode, parse_categories, parse_index
+from .discover import BASE, INDEX_URL, NEWS_URL, Listed, decode, parse_categories, parse_index, parse_news
 
 log = logging.getLogger(__name__)
 
@@ -49,6 +49,13 @@ def list_tournaments(fetcher: Fetcher, refresh_index: bool = True) -> list[Liste
     if html is None:
         raise RuntimeError("tournament index not available")
     listed = parse_index(html)
+    news = fetcher.text(NEWS_URL, refresh=refresh_index)
+    if news:
+        extra = parse_news(news, {i.key for i in listed})
+        if extra:
+            log.info("front page links %d events the season index lacks: %s", len(extra),
+                     ", ".join(i.key for i in extra))
+        listed += extra
     out: list[Listed] = []
     for item in listed:
         if item.url.endswith("kategorie.aspx"):

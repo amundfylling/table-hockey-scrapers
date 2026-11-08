@@ -57,10 +57,11 @@ def double_slot_conflicts(df: pd.DataFrame) -> list[tuple]:
 
 
 def carried_over_conflicts(df: pd.DataFrame) -> list[tuple]:
-    """(TournamentID, pair, score) where the same game (same pair, same score) is stored in both a basic group
-    and a final group of one tournament: a result carried over into the final group and stored twice."""
+    """(TournamentID, pair, score) stored in both a basic group and a final group of one tournament. Some are
+    real rematches that happen to end with the same score (about 350 of 300k Trefik games), so this list is for
+    reports; ``carried_over_stages`` is what fails a run."""
     rr = df[df["StageType"] == "roundrobin"]
-    is_final = rr["Stage"].str.startswith("Final groups") | rr["Stage"].str.contains(r"\bFinal groups\b")
+    is_final = rr["Stage"].str.contains("Final groups", regex=False)
     seen: dict[tuple, set[bool]] = defaultdict(set)
     for tid, a, b, ga, gb, fin in zip(rr["TournamentID"], rr["Player1ID"], rr["Player2ID"], rr["GoalsPlayer1"],
                                       rr["GoalsPlayer2"], is_final):
@@ -70,6 +71,30 @@ def carried_over_conflicts(df: pd.DataFrame) -> list[tuple]:
     return [k for k, v in sorted(seen.items()) if v == {True, False}]
 
 
+def carried_over_stages(df: pd.DataFrame, share: float = 0.6) -> list[tuple]:
+    """(TournamentID, Stage, pairs that met earlier, of them with the same score) for final-group stages that
+    still look carried over: at least ``share`` of the pairs that met earlier in the tournament repeat the score.
+    In a stage of real rematches a repeated score is a coincidence (typically 0-20%)."""
+    rr = df[df["StageType"] == "roundrobin"]
+    out = []
+    for tid, t in rr.groupby("TournamentID"):
+        fin = t[t["Stage"].str.contains("Final groups", regex=False)]
+        for (seq, stage), st in fin.groupby(["StageSequence", "Stage"]):
+            earlier: dict[tuple, set] = defaultdict(set)
+            prev = t[t["StageSequence"] < seq]
+            for a, b, ga, gb in zip(prev["Player1ID"], prev["Player2ID"], prev["GoalsPlayer1"], prev["GoalsPlayer2"]):
+                earlier[(a, b)].add((ga, gb))
+                earlier[(b, a)].add((gb, ga))
+            met = same = 0
+            for a, b, ga, gb in zip(st["Player1ID"], st["Player2ID"], st["GoalsPlayer1"], st["GoalsPlayer2"]):
+                if (a, b) in earlier:
+                    met += 1
+                    same += (ga, gb) in earlier[(a, b)]
+            if met and same / met >= share:
+                out.append((int(tid), stage, met, same))
+    return out
+
+
 def run_checks(df: pd.DataFrame, source: str, carried_over: bool = True) -> None:
     problems = []
     for tid, pid, a, b in shared_id_conflicts(df):
@@ -77,8 +102,8 @@ def run_checks(df: pd.DataFrame, source: str, carried_over: bool = True) -> None
     for sid, pid, s in double_slot_conflicts(df):
         problems.append(f"id {pid} fills rows {s} of stage {sid}")
     if carried_over:
-        for tid, a, b, ga, gb in carried_over_conflicts(df):
-            problems.append(f"{a}-{b} {ga}:{gb} is in a basic and a final group of tournament {tid}")
+        for tid, stage, met, same in carried_over_stages(df):
+            problems.append(f"{stage!r} of tournament {tid} repeats {same} of {met} earlier results (carried over)")
     if problems:
         raise DataCheckError(f"{source}: {len(problems)} data check failure(s):\n  " + "\n  ".join(problems[:50]))
 

@@ -71,14 +71,30 @@ Identical column order and dtypes to the existing scrapers (pandas `Int64` / `st
 One row per game (one row per game of a playoff series). Rows are sorted by
 `Date, TournamentID, StageSequence, RoundNumber, SourceMatchID`, so nightly commits only change when the data does.
 
+Three columns follow the shared ones (consumers that select columns by name are unaffected): `Country` and
+`City` of the event (Trefik: Czech Republic; galdahokejs.lv / escore.live: Latvia unless escore's location fields
+or the event name say otherwise; `City` only when the index or page names the town), and `Walkover` (`Yes` for a
+game the page marks as a forfeit; currently always `No`, because the sources either mark forfeits with "K" and
+those games are skipped, or do not mark them at all).
+
 Skipped, and counted by reason in the run report: byes, unplayed games, games without a score,
-walkovers/forfeits, and results carried forward from an earlier stage. Round-robin draws are kept.
-`Overtime` is `No` when the source cannot tell.
+walkovers/forfeits, and results carried forward from an earlier stage (Trefik "K" cells and round 0 of a final
+group in the JSON format, escore games with a `copy_game_id`, and final-group games that repeat an earlier result
+of the same pair in a stage where at least 60% of such pairs repeat it). escore games entered in two events of
+one day are kept once. Round-robin draws are kept. `Overtime` is `No` when the source cannot tell, and is cleared
+on the few games a page marks as overtime although they were not won by one goal.
+
+**Checks** (`scrapers/common/checks.py`, run before each Parquet is written; a failure stops that source): one
+id never carries two names that share no word in one tournament, one id never fills two rows of one cross-table,
+and no tournament has a carried-over final-group stage left.
 
 ## Player ids
 
 The H2H site's canonical id is the Sportscorpion `PlayerID`. `players_data.csv` and the ITHF `ranking.txt` are
-downloaded once per run (`data/_shared/`, not committed) and shared by every source.
+downloaded once per run (`data/_shared/`, not committed) and shared by every source. `ranking.txt` only lists
+active players, so a name it lacks entirely is looked up in bordshockey.net-scraper's `api_player_ids.csv`
+(name, ITHF id and nation of everyone who played a Swedish ranking event, active or not; `--ithf-archive`),
+unique matches only and never for a bare name when a `ml.`/`st.` variant with another ITHF id exists.
 
 1. Known ITHF id that matches a `RankingID` in `players_data.csv`: that `PlayerID` (lowest one if a RankingID is
    duplicated, as in table-hockey-eu-fetch).
@@ -91,8 +107,12 @@ downloaded once per run (`data/_shared/`, not committed) and shared by every sou
 5. Otherwise a source-local id (ranges below), stable across runs. Local ids stay in the registries even when a
    player stops using them; they are never renumbered or reused.
 
-Name matching folds diacritics, lowercases and compares the *set* of name tokens ("Plešák Pavel" =
-"Pavel Plesak"), and only accepts a unique match. When both sides have a nation it must match; a
+Name matching folds diacritics, lowercases, drops quoted nicknames ('Raivis "The Cobra" Miglinieks') and compares
+the *set* of name tokens ("Plešák Pavel" = "Pavel Plesak"), and only accepts a unique match. A name without a
+generation suffix matches a Sportscorpion name with one ("Michael Moravec" = "Michael Moravec ml.") only when
+exactly one Sportscorpion player has that base name and ranking.txt knows no other suffixed person of it.
+galdahokejs.lv and escore.live reuse each other's local id for a name that has exactly one there
+(`data/escore/player_ids.csv`, `data/galdahokejs/player_ids.csv`). When both sides have a nation it must match; a
 `players_data.csv` row without a country still counts against uniqueness. Every decision goes to
 `data/<source>/name_matches.csv` (column `method`). The mapping is re-run every run, so a player who later gets an
 ITHF id or appears on Sportscorpion switches to the real id. The report prints how many players were mapped by
@@ -148,11 +168,14 @@ write endpoints; a 401/403 raises `AccessDenied` and is never worked around.
 
 ## stiga.trefik.cz
 
-- **Discovery:** `stolni-hokej.cz/pohar.html` (re-read every run) lists every season. Season statistics (`data`,
+- **Discovery:** `stolni-hokej.cz/pohar.html` (re-read every run) lists every season; the federation's front page
+  is read too, because its news posts link events pohar.html has not listed yet (the 2026 national
+  championships). Season statistics (`data`,
   `data_new`, `ted20xx`) are ignored. National championships are split into one tournament per category: from the
   index row (2023+), `kategorie.aspx` (2018–2022) or the old hub pages (`index.htm` with "Turnaj jednotlivců /
   žen / juniorů / veteránů", 2000–2017). Name: `Czech Cup <place> <year>`, `Czech Open <year>`,
-  `Moravia Open <year>`, `Czech Championship <year> – <category>`.
+  `Moravia Open <year>`, `Czech Championship <year> – <category>`; when two events would get the same name the
+  year becomes the date (`Czech Cup Plzeň 20.09.2003`).
 - **Pages:** from the tournament page every result page in the same folder is followed (`kriz*`, `*cross*`,
   `*umisteni*`, `*playoff*`, `*_list*`, `*_wr*`, `*ranking*`). Identical cross-tables shown on several pages are read
   once. The 2026 events use a JSON file (`<tour>/m-<src>.json`) behind `ranking.html`, read directly.
