@@ -44,6 +44,24 @@ class IdRegistry:
             self._dirty = True
         return self._ids[key]
 
+    def assign(self, key: str, value: int, **extra: str) -> int:
+        """Store a given id for a new key (e.g. one reused from another source's registry)."""
+        key = str(key)
+        if key not in self._ids:
+            self._ids[key] = int(value)
+            self._extra[key] = {f: str(extra.get(f, "")) for f in self.extra_fields}
+            self._dirty = True
+        return self._ids[key]
+
+    def ids_by_name(self, key_func) -> dict:
+        """``key_func(name column) -> set of ids``, for looking a player up by name in another registry."""
+        out: dict = {}
+        for key, value in self._ids.items():
+            name = self._extra.get(key, {}).get("name", "")
+            if name:
+                out.setdefault(key_func(name), set()).add(value)
+        return out
+
     def save(self) -> None:
         if not self._dirty and self.path.exists():
             return

@@ -20,10 +20,12 @@ from pathlib import Path
 
 import pandas as pd
 
+from ..common.checks import clear_bad_overtime, run_checks
 from ..common.context import RunContext
-from ..common.dedupe import similarity
+from ..common.dedupe import drop_carried_over, similarity
 from ..common.trefik_sw import ascii_fold
 from ..common.http import AccessDenied
+from ..common.latvia import OtherRegistry
 from ..common.overlaps import near_date, table_hockey_eu_tournaments
 from ..common.players import PlayerMapper
 from ..common.registry import IdRegistry
@@ -263,6 +265,10 @@ def event_games(event_id: int, ev_props: dict, nets: list[dict], skips: SkipCoun
         if p1 not in players or p2 not in players:
             skips.skip("game with an unknown player", f"{event_id}/{g['id']}")
             continue
+        if g.get("copy_game_id"):
+            # escore copies a basic-group game into the final group when the two players meet there again
+            skips.skip("result carried forward (copy of an earlier game)", f"{event_id}/{g['id']}")
+            continue
         stage = stages.get(("group", g["group_id"])) if g.get("group_id") else \
             stages.get(("tree", g.get("elimination_tree_id")))
         if stage is not None and stage["type"] == "playoff":
@@ -291,7 +297,7 @@ def event_games(event_id: int, ev_props: dict, nets: list[dict], skips: SkipCoun
                 "event_id": event_id, "game_id": g["id"], "set": n, "p1": p1, "p2": p2, "g1": a, "g2": b,
                 "ot": ot, "stage": stage, "round": None if rnd is None else rnd + 1,
                 "game_no": n if stage["type"] == "playoff" else None, "net_id": g.get("net_id"),
-                "date": str(g.get("ended_at") or ev.get("start_date"))[:10],
+                "date": str(g.get("ended_at") or ev.get("start_date"))[:10], "ended": str(g.get("ended_at") or ""),
             })
     return out
 
@@ -302,8 +308,18 @@ def player_name(p: dict) -> str:
 
 
 class Resolver:
-    def __init__(self, mapper: PlayerMapper):
-        self.mapper = mapper
+    def __init__(self, mapper: PlayerMapper, registry: IdRegistry | None = None, other: OtherRegistry | None = None):
+        self.mapper, self.registry, self.other = mapper, registry, other
+
+    def local_id(self, pid: int, name: str) -> int:
+        """40_000_000 + escore player id, unless galdahokejs.lv already gave this name a unique local id."""
+        if self.registry is None:
+            return LOCAL_BASE + pid
+        key = f"escore:{pid}"
+        if key not in self.registry:
+            reused = self.other.unique_id(name) if self.other is not None else None
+            return self.registry.assign(key, LOCAL_BASE + pid if reused is None else reused, name=name)
+        return self.registry.lookup(key)
 
     def resolve(self, p: dict) -> int:
         pl = p.get("player") or {}
@@ -315,11 +331,48 @@ class Resolver:
         if ithf is None:
             ithf = self.mapper.match_ranking(name, nation=nation, source_key=key)
         sc = None if ithf else self.mapper.match_sportscorpion(name, nation, source_key=key)
-        return self.mapper.resolve(key, ithf=ithf, local_id=LOCAL_BASE + pid, sc_player_id=sc, name=name,
+        return self.mapper.resolve(key, ithf=ithf, local_id=self.local_id(pid, name), sc_player_id=sc, name=name,
                                    nation=nation)
 
 
-def to_rows(events: list[tuple], resolver: Resolver, s_reg: IdRegistry) -> list[dict]:
+def event_place(ev: dict, name: str) -> tuple[str, str | None]:
+    """(Country, City): escore's own location fields when set, else Latvia; an event named for Ukraine
+    ("Ukraine Cup", "...чемпіонат України") is Ukrainian."""
+    comp = ev.get("competition") or {}
+    code = ev.get("country_code") or comp.get("country_code")
+    city = ev.get("city") or comp.get("city") or None
+    if code:
+        from ..common.players import COUNTRY_NAMES, ithf_nation
+        country = COUNTRY_NAMES.get(ithf_nation(code) or "", str(code))
+    elif re.search(r"ukrain|україн", name, re.I):
+        country = "Ukraine"
+    else:
+        country = "Latvia"
+    return country, (str(city).strip() or None) if city else None
+
+
+def drop_cross_event_duplicates(kept: list[tuple], skips: SkipCounter) -> list[tuple]:
+    """The same game entered in two events of one day (e.g. an Amatieru Līga group game copied into the
+    Latvijas Kauss lower-league final group): same pair, same score, same date, different event. The copy
+    that ended later is dropped."""
+    seen: dict[tuple, tuple] = {}
+    for eid, _, _, _, games in kept:
+        for g in games:
+            a, b, ga, gb = g["p1"], g["p2"], g["g1"], g["g2"]
+            if a > b:
+                a, b, ga, gb = b, a, gb, ga
+            seen.setdefault((g["date"], a, b, ga, gb, g["set"]), []).append((g["ended"], g["game_id"], eid))
+    drop = set()
+    for key, found in seen.items():
+        if len({e for _, _, e in found}) > 1:
+            for ended, gid, eid in sorted(found)[1:]:
+                drop.add((eid, gid))
+                skips.skip("same game listed in two events (later copy dropped)", f"{eid}/{gid}")
+    return [(eid, name, start, players, [g for g in games if (eid, g["game_id"]) not in drop])
+            for eid, name, start, players, games in kept]
+
+
+def to_rows(events: list[tuple], resolver: Resolver, s_reg: IdRegistry, places: dict | None = None) -> list[dict]:
     rows = []
     for eid, name, start, players, games in events:
         resolver.mapper.begin_tournament(TOURNAMENT_BASE + eid)
@@ -341,6 +394,7 @@ def to_rows(events: list[tuple], resolver: Resolver, s_reg: IdRegistry) -> list[
                 "StageSequence": st["seq"], "StageType": st["type"], "TournamentURL": url, "ResultURL": net_url,
                 "StageURL": net_url, "SourceURL": net_url, "Source": SOURCE, "SourceTournamentID": str(eid),
                 "SourceStageID": stage_key, "SourceMatchID": f"{eid}/{g['game_id']}/{g['set']}",
+                "Country": (places or {}).get(eid, ("Latvia", None))[0], "City": (places or {}).get(eid, ("Latvia", None))[1],
             })
     return rows
 
@@ -382,8 +436,10 @@ def run(ctx: RunContext) -> pd.DataFrame:
         the_list = []
     s_reg = IdRegistry(sdir / "stage_ids.csv", STAGE_BASE + 1, ("name",))
     mapper = PlayerMapper(ctx.ref, "escore")
-    resolver = Resolver(mapper)
+    p_reg = IdRegistry(sdir / "player_ids.csv", LOCAL_BASE, ("name",))
+    resolver = Resolver(mapper, p_reg, OtherRegistry(ctx.source_dir("galdahokejs") / "player_ids.csv"))
     kept = []
+    places: dict[int, tuple[str, str | None]] = {}
     for eid, props, nets in events:
         ev = props["competitionEvent"]
         name, start = event_name(ev, props.get("otherEvents")), str(ev.get("start_date"))[:10]
@@ -397,13 +453,18 @@ def run(ctx: RunContext) -> pd.DataFrame:
             continue
         players = {p["player_id"]: p for p in props.get("participants") or [] if p.get("player_id")}
         kept.append((eid, name, start, players, list(event_games(eid, props, nets, skips))))
+        places[eid] = event_place(ev, name)
+    kept = drop_cross_event_duplicates(kept, skips)
     for _ in range(5):  # rebuilt while the "played each other" guard refuses name-based ids
-        rows = to_rows(kept, resolver, s_reg)
+        rows = to_rows(kept, resolver, s_reg, places)
         if not mapper.apply_guard():
             break
+    rows = clear_bad_overtime(drop_carried_over(rows, skips), skips)
     df = to_frame(rows)
+    run_checks(df, SOURCE)
     write_parquet(df, ctx.data_dir / OUTPUT)
     s_reg.save()
+    p_reg.save()
     mapper.write_name_matches(sdir / "name_matches.csv")
     print_report(SOURCE, df, skips, mapper.stats())
     return df

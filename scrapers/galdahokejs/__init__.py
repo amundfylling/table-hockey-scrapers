@@ -22,8 +22,11 @@ from urllib.parse import urlsplit
 import pandas as pd
 
 from ..common import trefik_sw as sw
+from ..common.checks import clear_bad_overtime, run_checks
 from ..common.context import RunContext
+from ..common.dedupe import drop_carried_over
 from ..common.http import decode_html
+from ..common.latvia import OtherRegistry
 from ..common.overlaps import near_date, sportscorpion_tournaments
 from ..common.players import PlayerMapper, fold
 from ..common.registry import IdRegistry
@@ -115,6 +118,7 @@ def crawl(ctx: RunContext, skips: SkipCounter) -> list[Parsed]:
             log.info("skip %s %s: on Sportscorpion as %s", p.date, p.name, clash[0][0])
             continue
         p.name = tournament_name(p)
+        p.country, p.city = "Latvia", event_city(p.name)
         kept.append(p)
     pool = defaultdict(list)
     for p in kept:
@@ -145,6 +149,18 @@ def tournament_name(p: Parsed) -> str:
     if not re.search(r"\b(19|20)\d\d\b", name):
         name = f"{name} {year}"
     return name
+
+
+# Towns named in event titles ("Rigas Kauss", "Inčukalns THC Challenge", "Ādažu līga"): the page's own statement.
+CITY_WORDS = {"rigas": "Rīga", "riga": "Rīga", "incukalns": "Inčukalns", "incukalna": "Inčukalns", "adazu": "Ādaži",
+              "adazi": "Ādaži"}
+
+
+def event_city(name: str) -> str | None:
+    for word in fold(name).split():
+        if word in CITY_WORDS:
+            return CITY_WORDS[word]
+    return None
 
 
 def latvian_reference_names(ctx: RunContext) -> list[str]:
@@ -249,15 +265,23 @@ def _write_sheets(sheets: dict[str, set[str]], path: Path) -> None:
 
 
 class Resolver:
-    def __init__(self, mapper: PlayerMapper, registry: IdRegistry, clubs: dict[str, str]):
-        self.mapper, self.registry, self.clubs = mapper, registry, clubs
+    def __init__(self, mapper: PlayerMapper, registry: IdRegistry, clubs: dict[str, str],
+                 other: OtherRegistry | None = None):
+        self.mapper, self.registry, self.clubs, self.other = mapper, registry, clubs, other
+
+    def local_id(self, key: str, name: str) -> int:
+        if key not in self.registry and self.other is not None:
+            reused = self.other.unique_id(sw.display_name(name))
+            if reused is not None:  # same player already has an escore.live local id
+                return self.registry.assign(key, reused, name=name)
+        return self.registry.get(key, name=name)
 
     def resolve(self, name: str) -> int:
         display = sw.display_name(name)
         key = f"{fold(name)}|{fold(self.clubs.get(name, ''))}"
         ithf = self.mapper.match_ranking(display, prefer_nation="LAT", source_key=key)
         sc = None if ithf else self.mapper.match_sportscorpion(display, source_key=key)
-        local = self.registry.get(key, name=name)
+        local = self.local_id(key, name)
         return self.mapper.resolve(key, ithf=ithf, local_id=local, sc_player_id=sc, name=display)
 
 
@@ -293,7 +317,7 @@ def _to_rows(events: list[Parsed], resolver: Resolver, t_reg: IdRegistry, s_reg:
                 "TournamentName": t.name, "TournamentID": tid, "StageSequence": g.stage_seq,
                 "StageType": g.stage_type, "TournamentURL": t.url, "ResultURL": g.url, "StageURL": g.url,
                 "SourceURL": g.url, "Source": SOURCE, "SourceTournamentID": t.key, "SourceStageID": stage_key,
-                "SourceMatchID": g.match_id,
+                "SourceMatchID": g.match_id, "Country": t.country, "City": t.city,
             })
     # Old pages print Latvian names in a lossy code page ('Kalninš'); one spelling per player id, the most used.
     spellings: dict[int, Counter] = defaultdict(Counter)
@@ -319,7 +343,10 @@ def run(ctx: RunContext) -> pd.DataFrame:
         for n, ref in t.players.items():
             if getattr(ref, "club", None):
                 clubs.setdefault(n, ref.club)
-    df = to_frame(to_rows(events, Resolver(mapper, p_reg, clubs), t_reg, s_reg))
+    other = OtherRegistry(ctx.source_dir("escore") / "player_ids.csv")
+    rows = to_rows(events, Resolver(mapper, p_reg, clubs, other), t_reg, s_reg)
+    df = to_frame(clear_bad_overtime(drop_carried_over(rows, skips), skips))
+    run_checks(df, SOURCE)
     write_parquet(df, ctx.data_dir / OUTPUT)
     for reg in (t_reg, s_reg, p_reg):
         reg.save()

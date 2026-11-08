@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .http import PoliteClient
-from .players import PLAYERS_CSV_URL, RANKING_URL, ReferenceData, load_reference
+from .players import ITHF_ARCHIVE_URL, PLAYERS_CSV_URL, RANKING_URL, ReferenceData, load_reference
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data"
@@ -31,6 +31,8 @@ def add_common_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--offline", action="store_true", help="only use data/<source>/raw, fetch nothing new")
     parser.add_argument("--players-csv", default=PLAYERS_CSV_URL, help="Sportscorpion players_data.csv (URL/path)")
     parser.add_argument("--ranking", default=RANKING_URL, help="ITHF ranking.txt (URL/path)")
+    parser.add_argument("--ithf-archive", default=ITHF_ARCHIVE_URL,
+                        help="name -> ITHF id list that includes inactive players (URL/path, '' to turn off)")
     parser.add_argument("-v", "--verbose", action="store_true")
 
 
@@ -50,7 +52,7 @@ def _shared_copy(client: PoliteClient, source: str | None, name: str) -> str | N
         resp.raise_for_status()
     except Exception as exc:  # noqa: BLE001
         logging.getLogger(__name__).error("could not download %s: %s", source, exc)
-        return str(path) if path.exists() else (None if name == "ranking.txt" else source)
+        return str(path) if path.exists() else (None if name in ("ranking.txt", "ithf_archive.csv") else source)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(resp.content)
     return str(path)
@@ -62,5 +64,6 @@ def build_context(args: argparse.Namespace) -> RunContext:
     client = PoliteClient()
     players = _shared_copy(client, args.players_csv, "players_data.csv")
     ranking = _shared_copy(client, args.ranking, "ranking.txt")
-    ref = load_reference(players, ranking, client)
+    archive = _shared_copy(client, getattr(args, "ithf_archive", None), "ithf_archive.csv")
+    ref = load_reference(players, ranking, client, ithf_archive=archive)
     return RunContext(client=client, ref=ref, offline=args.offline)
