@@ -4,7 +4,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 import pytest
 
-from scrapers.common.schema import COLUMNS, SchemaError, to_frame, validate, write_parquet
+from scrapers.common.schema import BASE_COLUMNS, COLUMNS, EXTRA_SCHEMA, SchemaError, to_frame, validate, write_parquet
 
 FIX = Path(__file__).parent / "fixtures"
 
@@ -14,18 +14,22 @@ def test_roundtrip_matches_reference_schema(tmp_path):
     ref_path = FIX / "table_hockey_eu_sample.parquet"
     ref = pd.read_parquet(ref_path)
     out = tmp_path / "out.parquet"
-    write_parquet(to_frame(ref.to_dict("records")), out)
-    assert pq.read_schema(out).names == pq.read_schema(ref_path).names == COLUMNS
-    assert pq.read_schema(out).types == pq.read_schema(ref_path).types
+    write_parquet(to_frame([{**r, "Country": "Sweden"} for r in ref.to_dict("records")]), out)
+    # the shared columns come first, unchanged; this repo's extra columns follow
+    n = len(BASE_COLUMNS)
+    assert pq.read_schema(out).names[:n] == pq.read_schema(ref_path).names == BASE_COLUMNS
+    assert pq.read_schema(out).names == COLUMNS == BASE_COLUMNS + list(EXTRA_SCHEMA)
+    assert pq.read_schema(out).types[:n] == pq.read_schema(ref_path).types
     back = pd.read_parquet(out)
-    assert [str(t) for t in back.dtypes] == [str(t) for t in ref.dtypes]
+    assert [str(t) for t in back.dtypes][:n] == [str(t) for t in ref.dtypes]
+    assert back["Walkover"].eq("No").all()
 
 
 def _row(**kw):
     base = dict(StageID=1, Player1="A B", Player1ID=1, Player2="C D", Player2ID=2, GoalsPlayer1=3, GoalsPlayer2=3,
                 Overtime="No", Stage="Basic groups 1", RoundNumber=None, PlayoffGameNumber=None, Date="2025-01-02",
                 TournamentName="T", TournamentID=10, StageSequence=1, StageType="roundrobin", Source="s",
-                SourceTournamentID="t", SourceStageID="g", SourceMatchID="m1")
+                SourceTournamentID="t", SourceStageID="g", SourceMatchID="m1", Country="Latvia")
     base.update(kw)
     return base
 

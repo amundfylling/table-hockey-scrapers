@@ -22,6 +22,8 @@ import pandas as pd
 
 from ..common import trefik_sw as sw
 from ..common.context import RunContext
+from ..common.checks import clear_bad_overtime, run_checks
+from ..common.dedupe import drop_carried_over
 from ..common.players import PlayerMapper, fold, name_key  # noqa: F401 (PlayerMapper re-exported for tests)
 from ..common.registry import IdRegistry
 from ..common.report import SkipCounter, print_report
@@ -37,6 +39,7 @@ TOURNAMENT_BASE = 3_000_000_000
 STAGE_BASE = 3_100_000_000
 IDPL_BASE = 20_000_000
 LOCAL_BASE = 21_000_000
+COUNTRY = "Czech Republic"  # every stiga.trefik.cz event in the federation's index is played in Czechia
 REFRESH_DAYS = 10  # events newer than this are re-fetched every run (results may still be added)
 
 NATION_CODES = {
@@ -88,6 +91,8 @@ class Parsed:
     players: dict[str, PlayerRef] = field(default_factory=dict)  # by page name
     games: list[Game] = field(default_factory=list)
     pending_groups: list = field(default_factory=list)  # (url, trefik_sw.Group) until names are resolved
+    country: str = COUNTRY
+    city: str | None = None
 
 
 def tournament_name(item: Listed, title: str, when: date) -> str:
@@ -97,12 +102,55 @@ def tournament_name(item: Listed, title: str, when: date) -> str:
         return f"Czech Championship {when.year}" + (f" – {cat}" if cat else "")
     if "czech open" in sw.ascii_fold(label):
         return f"Czech Open {when.year}"
-    place = title.split(",", 1)[0].strip() if title else label
-    if not place or parse_date_only(place):
-        place = label
+    place = _title_place(title) or label
     if sw.ascii_fold(place).startswith("moravia open") or label.endswith(", MO"):
         return f"Moravia Open {when.year}"
     return f"Czech Cup {place} {when.year}"
+
+
+# a date at the end of a page title: "Brno 2. únor 2019", "Třinec 19. březen 2022", "Plzeň 3.11.2001"
+_TRAILING_DATE = re.compile(r"[\s,]*(\d{1,2}\.\s*(-\s*\d{1,2}\.\s*)?([^\d\s,]+|\d{1,2}\.)\s*)?(19|20)\d\d\s*$")
+
+
+def _title_place(title: str) -> str:
+    """Place from a page title, without the date: "Brno 2. únor 2019" / "Plzeň, 21. leden 2023" -> the town."""
+    place = (title or "").split(",", 1)[0].strip()
+    place = _TRAILING_DATE.sub("", place).strip(" ,-")
+    return "" if not place or parse_date_only(place) else place
+
+
+def tournament_city(item: Listed, title: str) -> str | None:
+    """Town of the event when the index or the page names it: "Czech Open, Praha", "Czech Open - Plzen",
+    "MR, Turnov", or the Czech Cup town."""
+    for text in (item.label, item.row_label):
+        if text and "," in text:
+            first, town = (x.strip() for x in text.split(",", 1))
+            if town == "MO":  # "Olomouc, MO" = Moravia Open in Olomouc
+                return first or None
+            if town and not parse_date_only(town):
+                return town
+    head = (title or "").split(",", 1)[0]
+    if " - " in head:  # "Czech Open - Praha, 25. duben 2009"
+        town = _TRAILING_DATE.sub("", head.split(" - ", 1)[1]).strip()
+        return town or None
+    if item.category is not None or "czech open" in sw.ascii_fold(item.label):
+        return None  # "MR jednotlivci 3. červen 2018": no town on the page
+    place = _title_place(title) or item.label
+    if sw.ascii_fold(place).startswith(("moravia open", "mr ")):
+        return None
+    return place or None
+
+
+def dedupe_names(parsed: list["Parsed"]) -> None:
+    """Two events that would get the same name ("Czech Cup Plzeň 2003" three times) get their date instead of
+    only the year: "Czech Cup Plzeň 20.09.2003"."""
+    counts: dict[str, int] = defaultdict(int)
+    for p in parsed:
+        counts[p.name] += 1
+    for p in parsed:
+        if counts[p.name] > 1:
+            y, m, d = p.date.split("-")
+            p.name = re.sub(rf"\b{y}\b", f"{d}.{m}.{y}", p.name, count=1)
 
 
 def parse_date_only(text: str) -> bool:
@@ -158,7 +206,8 @@ def _parse_one(fetcher: Fetcher, item: Listed, key: str, category: str | None, u
         skips.skip("tournament without a date", key)
         return None
     named = Listed(item.key, item.url, item.season, item.label, item.row_label, item.index_date, category, item.kind)
-    parsed = Parsed(key, tournament_name(named, ev.title, when), when.isoformat(), url)
+    parsed = Parsed(key, tournament_name(named, ev.title, when), when.isoformat(), url,
+                    city=tournament_city(named, ev.title))
     return assemble(parsed, pages, skips)
 
 
@@ -340,7 +389,10 @@ def parse_json_event(fetcher: Fetcher, item: Listed, skips: SkipCounter, refresh
         skips.skip("tournament without a date", item.key)
         return None
     title = data.get("tourn", {}).get("where", item.label)
-    parsed = Parsed(item.key, tournament_name(item, title, when), when.isoformat(), item.url)
+    where = data.get("tourn", {}).get("where") or ""
+    parsed = Parsed(item.key, tournament_name(item, title, when), when.isoformat(), item.url,
+                    city=tournament_city(item, title) if item.category is None else (
+                        _title_place(where) if not sw.ascii_fold(where).startswith(("mr", "czech")) else None))
     by_id: dict[int, str] = {}
     for p in data.get("players", []):
         name = p["name"]
@@ -356,6 +408,10 @@ def parse_json_event(fetcher: Fetcher, item: Listed, skips: SkipCounter, refresh
         p1, p2 = by_id.get(m["h_id"]), by_id.get(m["a_id"])
         if not scores or not p1 or not p2:
             skips.skip("unplayed group game" if not scores else "game with an unknown player")
+            continue
+        if gid >= 100 and m.get("rnd") == 0:
+            # round 0 of a final group holds the basic-group results the two players bring with them
+            skips.skip("result carried forward from basic group (final group round 0)")
             continue
         for k, (g1, g2, flag) in enumerate(scores, start=1):
             if flag == "K":
@@ -462,7 +518,7 @@ def _to_rows(parsed: list[Parsed], resolver: IdResolver, t_reg: IdRegistry, s_re
                 "Date": t.date, "TournamentName": t.name, "TournamentID": tid, "StageSequence": g.stage_seq,
                 "StageType": g.stage_type, "TournamentURL": t.url, "ResultURL": g.url, "StageURL": g.url,
                 "SourceURL": g.url, "Source": SOURCE, "SourceTournamentID": t.key, "SourceStageID": stage_key,
-                "SourceMatchID": g.match_id,
+                "SourceMatchID": g.match_id, "Country": t.country, "City": t.city,
             })
     return rows
 
@@ -508,6 +564,7 @@ def crawl(ctx: RunContext, skips: SkipCounter, refresh_days: int = REFRESH_DAYS)
         else:
             skips.skip("tournament without games", p.key)
     parsed = kept
+    dedupe_names(parsed)
     print("Tournaments per season:", ", ".join(f"{s}: {n}" for s, n in sorted(by_season.items())))
     return parsed
 
@@ -521,7 +578,9 @@ def run(ctx: RunContext) -> pd.DataFrame:
     p_reg = IdRegistry(sdir / "player_ids.csv", LOCAL_BASE + 1, ("name",))
     mapper = PlayerMapper(ctx.ref, "trefik")
     resolver = IdResolver(parsed, mapper, p_reg)
-    df = to_frame(to_rows(parsed, resolver, t_reg, s_reg))
+    rows = clear_bad_overtime(drop_carried_over(to_rows(parsed, resolver, t_reg, s_reg), skips), skips)
+    df = to_frame(rows)
+    run_checks(df, SOURCE)
     write_parquet(df, ctx.data_dir / OUTPUT)
     for reg in (t_reg, s_reg, p_reg):
         reg.save()

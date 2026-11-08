@@ -91,9 +91,10 @@ def _tokens(text: str) -> list[str]:
     return [t for t in re.split(r"[\s.]+", ascii_fold(text)) if t]
 
 
-def abbrev_matches(abbrev: str, full: str) -> bool:
+def abbrev_matches(abbrev: str, full: str, strict: bool = False) -> bool:
     """Does a cross-table label ('Kr Lebl', 'L.Turoň', 'Zd Matoušek ml.') fit a full name
-    ('Lebl Kryštof', 'Matoušek ml. Zdeněk' - surname first)?"""
+    ('Lebl Kryštof', 'Matoušek ml. Zdeněk' - surname first)? ``strict`` turns off the written-out nickname rule
+    ('Vojta' = 'Vojtěch'), so 'Mark Ābele' fits 'Ābele Markuss' but not 'Ābele Margarita'."""
     a = _tokens(abbrev)
     f = _tokens(full)
     if not a or not f:
@@ -117,18 +118,18 @@ def abbrev_matches(abbrev: str, full: str) -> bool:
     # the surname is every full-name token except the first name(s); try each split
     for k in range(1, len(f_core)):
         surname, first = f_core[:k], f_core[k:]
-        if surname == rest_core and _first_ok(first[0], prefix):
+        if surname == rest_core and _first_ok(first[0], prefix, strict):
             return True
         # some pages put the first name first: "Rainers Kalninš"
         first2, surname2 = f_core[: len(f_core) - k], f_core[len(f_core) - k:]
-        if surname2 == rest_core and _first_ok(first2[0], prefix):
+        if surname2 == rest_core and _first_ok(first2[0], prefix, strict):
             return True
     return False
 
 
-def _first_ok(first: str, prefix: str) -> bool:
+def _first_ok(first: str, prefix: str, strict: bool = False) -> bool:
     """'Kr' fits 'kryštof'; a written-out nickname 'Vojta' fits 'Vojtěch' (same first three letters)."""
-    return first.startswith(prefix) or (len(prefix) >= 4 and first[:3] == prefix[:3])
+    return first.startswith(prefix) or (not strict and len(prefix) >= 4 and first[:3] == prefix[:3])
 
 
 def display_name(surname_first: str) -> str:
@@ -241,8 +242,15 @@ def parse_participants(html: str) -> list[tuple[int | None, int | None, str]]:
     soup = BeautifulSoup(html, "lxml")
     out = []
     for tr in soup.find_all("tr"):
+        if tr.find("tr") is not None:
+            continue  # a layout row that wraps the whole list: its links belong to many players
+        links = tr.find_all("a", href=True)
+        idpls = {_idpl(a["href"]) for a in links if "idpl=" in a["href"]}
+        ithf_links = [a for a in links if re.search(r"ithf/ranking/player\.aspx", a["href"], re.I)]
+        if len(idpls) > 1 or len(ithf_links) > 1:
+            continue  # more than one player in one row: an id could be paired with the wrong name
         idpl, ithf, name = None, None, ""
-        for a in tr.find_all("a", href=True):
+        for a in links:
             href = a["href"]
             if "idpl=" in href:
                 idpl = _idpl(href)
@@ -361,6 +369,13 @@ def resolve_group_names(group: Group, candidates: list[str], exclude: set[str] |
             taken.add(row.full)
             continue
         options = [c for c in pool if abbrev_matches(row.label, c)]
+        if len(options) > 1:
+            # 'Marg Ābele' / 'Mark Ābele': a real prefix beats the nickname rule, and a longer full name beats
+            # a candidate that is only the same short label seen on another page
+            options = [c for c in options if abbrev_matches(row.label, c, strict=True)] or options
+            lab = set(_tokens(row.label))
+            longer = [c for c in options if (extra := set(_tokens(c)) - lab) and not extra <= _SUFFIX]
+            options = longer or options
         if len(options) > 1:
             options = [c for c in options if c not in exclude] or options
         if len(options) > 1 and group.round_games:

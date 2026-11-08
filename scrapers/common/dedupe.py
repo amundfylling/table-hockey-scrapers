@@ -73,3 +73,47 @@ def check_and_report(df: pd.DataFrame, report_path: Path | None = None) -> pd.Da
         report_path.parent.mkdir(parents=True, exist_ok=True)
         dups.to_csv(report_path, index=False, lineterminator="\n")
     return dups
+
+
+# --------------------------------------------------------------------------------------------------
+# Results carried over into a final group
+# --------------------------------------------------------------------------------------------------
+
+CARRY_SHARE = 0.6  # a final-group stage counts as "carried over" when this share of earlier pairs repeat a score
+
+
+def drop_carried_over(rows: list[dict], skips=None) -> list[dict]:
+    """Drop final-group games that only repeat an earlier game of the same tournament (same pair, same score).
+
+    Some events copy the basic-group result of two players who meet again in a final group instead of playing
+    again, and the page does not mark it. A final-group stage is treated as carried over only when at least
+    ``CARRY_SHARE`` of its pairs that met earlier in the tournament have exactly the earlier score; in other
+    stages a repeated score is a coincidence and the game stays (real rematches survive)."""
+    by_t: dict = {}
+    for i, r in enumerate(rows):
+        if r["StageType"] == "roundrobin":
+            by_t.setdefault(r["TournamentID"], []).append(i)
+    drop: set[int] = set()
+    for idx in by_t.values():
+        stages: dict = {}
+        for i in idx:
+            r = rows[i]
+            if "Final groups" in r["Stage"]:
+                stages.setdefault((r["StageSequence"], r["Stage"]), []).append(i)
+        for (seq, stage), members in stages.items():
+            earlier: dict = {}
+            for i in idx:
+                r = rows[i]
+                if r["StageSequence"] < seq:
+                    earlier.setdefault((r["Player1ID"], r["Player2ID"]), set()).add((r["GoalsPlayer1"], r["GoalsPlayer2"]))
+                    earlier.setdefault((r["Player2ID"], r["Player1ID"]), set()).add((r["GoalsPlayer2"], r["GoalsPlayer1"]))
+            met = [i for i in members if (rows[i]["Player1ID"], rows[i]["Player2ID"]) in earlier]
+            same = [i for i in met if (rows[i]["GoalsPlayer1"], rows[i]["GoalsPlayer2"])
+                    in earlier[(rows[i]["Player1ID"], rows[i]["Player2ID"])]]
+            if met and len(same) / len(met) >= CARRY_SHARE:
+                drop.update(same)
+                if skips is not None:
+                    for i in same:
+                        skips.skip("final-group game repeating an earlier result (carried over)",
+                                   f"{rows[i]['TournamentName']} {stage}")
+    return [r for i, r in enumerate(rows) if i not in drop]

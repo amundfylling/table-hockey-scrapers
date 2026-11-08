@@ -33,7 +33,7 @@ def combine(data_dir) -> pd.DataFrame:
             frames.append(pd.read_parquet(path))
     if not frames:
         return to_frame([])
-    df = pd.concat(frames, ignore_index=True)[COLUMNS]
+    df = pd.concat(frames, ignore_index=True).reindex(columns=COLUMNS)
     return to_frame(df.to_dict("records"))
 
 

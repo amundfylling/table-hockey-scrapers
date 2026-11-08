@@ -38,6 +38,11 @@ SCHEMA: dict[str, str] = {
     "SourceStageID": "string",
     "SourceMatchID": "string",
 }
+BASE_COLUMNS = list(SCHEMA)
+# Columns this repo adds after the shared ones (the H2H site ignores columns it does not know):
+# Country / City of the event, Walkover = "Yes" for a game the page marks as a forfeit (score is the forfeit score).
+EXTRA_SCHEMA: dict[str, str] = {"Country": "string", "City": "string", "Walkover": "string"}
+SCHEMA = {**SCHEMA, **EXTRA_SCHEMA}
 COLUMNS = list(SCHEMA)
 SORT_KEYS = ["Date", "TournamentID", "StageSequence", "RoundNumber", "SourceMatchID"]
 REQUIRED = [
@@ -57,8 +62,9 @@ def to_frame(rows: Iterable[Mapping]) -> pd.DataFrame:
     df = pd.DataFrame(list(rows))
     for col in COLUMNS:
         if col not in df.columns:
-            df[col] = pd.NA
+            df[col] = "No" if col == "Walkover" else pd.NA
     df = df[COLUMNS]
+    df["Walkover"] = df["Walkover"].where(df["Walkover"].notna(), "No")
     for col, dtype in SCHEMA.items():
         df[col] = df[col].astype(dtype)
     df = df.sort_values(SORT_KEYS, kind="mergesort", na_position="first").reset_index(drop=True)
@@ -78,6 +84,10 @@ def validate(df: pd.DataFrame) -> None:
             raise SchemaError(f"{col} has {int(df[col].isna().sum())} missing values")
     if not df["Overtime"].isin(["Yes", "No"]).all():
         raise SchemaError("Overtime must be Yes/No")
+    if not df["Walkover"].isin(["Yes", "No"]).all():
+        raise SchemaError("Walkover must be Yes/No")
+    if df["Country"].isna().any():
+        raise SchemaError("Country missing")
     if not df["StageType"].isin(["roundrobin", "playoff"]).all():
         raise SchemaError("StageType must be roundrobin/playoff")
     if not df["Date"].str.match(_DATE).all():

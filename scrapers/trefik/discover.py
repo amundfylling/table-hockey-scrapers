@@ -11,6 +11,9 @@ from bs4 import BeautifulSoup
 from ..common.http import decode_html
 
 INDEX_URL = "https://www.stolni-hokej.cz/pohar.html"
+# The federation's front page: its news posts link events that pohar.html has not listed yet (e.g. the 2026
+# national championships, which pohar.html still lacks in November 2026).
+NEWS_URL = "https://www.stolni-hokej.cz/"
 BASE = "https://stiga.trefik.cz/cz_turnaje/"
 
 # Season statistics, not tournaments.
@@ -107,6 +110,38 @@ def parse_index(html: str) -> list[Listed]:
                 category = CATEGORY_LABELS.get(_fold(label), "" if not multi else label)
             kind = "json" if "ranking.html" in url else "html"
             out.append(Listed(key, url, season_of(key), label, row_label, date_text, category, kind))
+    return out
+
+
+def parse_news(html: str, known: set[str]) -> list[Listed]:
+    """Events linked from the front page's news posts (``<h2>Title<span class="art">[24.5.2026]</span></h2>`` and
+    the links after it) whose key the season index does not have. Only Trefik result pages count."""
+    soup = BeautifulSoup(html, "lxml")
+    out: list[Listed] = []
+    seen = set(known)
+    for h2 in soup.find_all("h2"):
+        span = h2.find("span", class_="art")
+        date_text = span.get_text(strip=True).strip("[] ") if span else ""
+        title = " ".join((h2.find(string=True, recursive=False) or "").split())
+        links = []
+        for sib in h2.find_next_siblings():
+            if sib.name == "h2":
+                break
+            links += sib.find_all("a", href=True) if hasattr(sib, "find_all") else []
+        links = [a for a in links if _is_tournament_link(urljoin(NEWS_URL, a["href"]))]
+        multi = len(links) > 1
+        championship = _fold(title).startswith("mr")
+        for a in links:
+            url = urljoin(NEWS_URL, a["href"].strip())
+            key = key_for(url)
+            if key in seen:
+                continue
+            seen.add(key)
+            label = " ".join(a.get_text(" ", strip=True).split())
+            category = CATEGORY_LABELS.get(_fold(label), label if multi else "") if championship else None
+            kind = "json" if "ranking.html" in url else "html"
+            out.append(Listed(key, url, season_of(key), label, "MR" if championship else label, date_text,
+                              category, kind))
     return out
 
 
