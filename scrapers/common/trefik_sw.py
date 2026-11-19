@@ -108,7 +108,9 @@ def abbrev_matches(abbrev: str, full: str, strict: bool = False) -> bool:
     if prefix in ("m", "ml", "st", "s") and raw_prefix.islower():  # 'ml Chylík' / 'm.Chylík' = Chylík ml.
         suffix = "ml" if prefix.startswith("m") else "st"
         f_core = [t for t in f if t not in _SUFFIX]
-        return suffix in f and len(rest) == 1 and rest[0] in f_core[:-1]
+        # surname-first pages: the surname is before the first name; ithf.info prints "ml. Jiří Chylík"
+        surnames = f_core if raw_full_prefix_is_suffix(full) else f_core[:-1]
+        return suffix in f and len(rest) == 1 and rest[0] in surnames
     rest_core = [t for t in rest if t not in _SUFFIX]
     rest_suffix = [t for t in rest if t in _SUFFIX]
     f_core = [t for t in f if t not in _SUFFIX]
@@ -125,6 +127,11 @@ def abbrev_matches(abbrev: str, full: str, strict: bool = False) -> bool:
         if surname2 == rest_core and _first_ok(first2[0], prefix, strict):
             return True
     return False
+
+
+def raw_full_prefix_is_suffix(full: str) -> bool:
+    """'ml. Jiří Chylík': the generation mark is printed before a first-name-first full name."""
+    return bool(re.match(r"\s*(ml|st)\.?\s", full, re.I))
 
 
 def _first_ok(first: str, prefix: str, strict: bool = False) -> bool:
@@ -275,6 +282,7 @@ class CrossRow:
     label: str                       # as printed: 'Kr Lebl', 'L.Turoň' or a full name
     cells: list[str]                 # one per column (own column = '*')
     full: str | None = None          # resolved full name (surname first)
+    nation: str | None = None        # ITHF event pages print the nation code after the name ("RUS")
 
 
 @dataclass
@@ -320,7 +328,7 @@ def parse_groups_page(html: str) -> list[Group]:
     for table in soup.find_all("table"):
         diag = [td for td in table.find_all("td", class_="kx") if td.find_parent("table") is table]
         if diag:
-            rows = []
+            parsed_rows = []
             for tr in table.find_all("tr", recursive=False) or table.find_all("tr"):
                 if tr.find_parent("table") is not table:
                     continue
@@ -328,9 +336,18 @@ def parse_groups_page(html: str) -> list[Group]:
                 name_idx = next((i for i, td in enumerate(tds) if "kt" in (td.get("class") or [])), None)
                 if name_idx is None:
                     continue
-                label = clean_name(tds[name_idx].get_text(" ", strip=True))
-                cells = [td.get_text(" ", strip=True) for td in tds[name_idx + 1:]]
-                rows.append(CrossRow(label, cells))
+                parsed_rows.append((clean_name(tds[name_idx].get_text(" ", strip=True)), tds[name_idx + 1:]))
+            # international events (ithf.info, Czech championships from 2019) add a nation column after the name:
+            # <td class=ic>RUS</td>, empty for players without a nation. It is not a game column.
+            nation_col = any(rest and "ic" in (rest[0].get("class") or [])
+                             and re.fullmatch(r"[A-Z]{3}", rest[0].get_text(strip=True)) for _, rest in parsed_rows)
+            rows = []
+            for label, rest in parsed_rows:
+                nation = None
+                if nation_col and rest and "ic" in (rest[0].get("class") or []):
+                    nation = rest[0].get_text(strip=True) or None
+                    rest = rest[1:]
+                rows.append(CrossRow(label, [td.get_text(" ", strip=True) for td in rest], nation=nation))
             n = len(rows)
             for r in rows:
                 r.cells = r.cells[:n]
@@ -350,6 +367,16 @@ def parse_groups_page(html: str) -> list[Group]:
                                                 clean_name(tds[2].get_text(" ", strip=True)),
                                                 tds[3].get_text(" ", strip=True)))
     return groups
+
+
+def _exact_prefix(label: str, full: str) -> bool:
+    """The label's first-name prefix starts a token of the full name, accents kept (case ignored)."""
+    parts = re.split(r"[\s.]+", label.strip())
+    if len(parts) < 2:
+        return False
+    prefix = parts[0].lower()
+    rest = {t.lower() for t in parts[1:]}
+    return any(t.lower().startswith(prefix) for t in re.split(r"[\s.,]+", full) if t and t.lower() not in rest)
 
 
 def resolve_group_names(group: Group, candidates: list[str], exclude: set[str] | frozenset = frozenset()) -> list[str]:
@@ -376,6 +403,9 @@ def resolve_group_names(group: Group, candidates: list[str], exclude: set[str] |
             lab = set(_tokens(row.label))
             longer = [c for c in options if (extra := set(_tokens(c)) - lab) and not extra <= _SUFFIX]
             options = longer or options
+        if len(options) > 1:
+            # 'Ma Papp' / 'Má Papp' = 'Magor Papp' / 'Mátyás Papp': compare the prefix with accents kept
+            options = [c for c in options if _exact_prefix(row.label, c)] or options
         if len(options) > 1:
             options = [c for c in options if c not in exclude] or options
         if len(options) > 1 and group.round_games:

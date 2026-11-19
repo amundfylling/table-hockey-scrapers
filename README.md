@@ -13,7 +13,12 @@ Parquet file per source in exactly the schema of
 | `escore` | escore.live | Latvian events from 2025-12-01, Ukraine Cup 2026 | `data/escore_results.parquet` |
 | `finland` | tulos.poytajaakiekko.fi | Finnish ranking tournaments 1992– | `data/finland_results.parquet` |
 
-`data/all_results.parquet` is the four files concatenated, for consumers that prefer a single file.
+`data/all_results.parquet` is the four files concatenated, plus the one-off backfill below, for consumers that
+prefer a single file.
+
+**One-off backfill** (not crawled by the nightly run, built once and committed): `ithf_archive` → World Championship
+2017, Liberec, from the Wayback Machine copy of ithf.info → `data/ithf_archive_results.parquet` (see
+"ithf.info archive" below).
 
 ## Status
 
@@ -132,6 +137,7 @@ the site's `aliases.json`.
 | finland | 4_000_000_000 + n | 4_100_000_000 + n | 30_000_000+ from `player_ids.csv` (key: site cuid) |
 | escore | 5_000_000_000 + event id | 5_100_000_000 + n | 40_000_000 + escore player id |
 | galdahokejs | 6_000_000_000 + n | 6_100_000_000 + n | 50_000_000+ from `player_ids.csv` (key: folded name + club) |
+| ithf_archive | 7_000_000_000 + n | 7_100_000_000 + n | 20_000_000 + idpl (stiga.trefik.cz's player ids), else 60_000_000+ from `player_ids.csv` |
 
 `n` comes from committed registries under `data/<source>/`.
 
@@ -222,6 +228,38 @@ write endpoints; a 401/403 raises `AccessDenied` and is never worked around.
 - **Ids:** `ithf_id` on the player, else ranking.txt (player's nation), else Sportscorpion name + country, else
   40_000_000 + escore player id. Events from before 2025-12-01 and events also on table-hockey.eu (same name, ±1 day)
   are skipped.
+
+## ithf.info archive (World Championship 2017) – one-off
+
+- **Pages:** `python -m scrapers.ithf_archive.fetch` lists every capture under `ithf.info/stiga/turnaje2017/ms/` in
+  the Wayback CDX index and saves the latest 200 capture of each page raw (`id_` mode) to
+  `data/ithf_archive/wc2017/raw/` (committed; `manifest.csv` has the capture used per page, `missing.csv` every
+  linked page without a capture). web.archive.org refuses connections from the development environment, so the
+  pages were fetched once by a temporary GitHub Actions workflow; the script is not in the nightly run.
+- **Parsing:** `python -m scrapers.ithf_archive` (offline, needs only the reference data). Trefik SW pages, parsed with
+  the shared parser and the trefik module's assembly; one tournament per category: `World Championship 2017`
+  (Open), `– Women`, `– Juniors`, `– Veterans`, `– 50+`, `– U13`. Team events are skipped. ithf.info prints a nation
+  column after the name in cross-tables (`<td class=ic>RUS</td>`, empty for players without one), which the
+  shared parser now skips (the Czech championships from 2019 have it too, see below), and first
+  names first ("ml. Jiří Chylík", "I Martin Vépy"); labels are matched accent-sensitively when the folded match is
+  ambiguous ("Ma Papp" = Magor, "Má Papp" = Mátyás). Two veterans who played the Open basic groups but are missing
+  from its participants list are matched to the event's other lists.
+- **Date:** the pages carry no date; every game is dated 2017-06-16, the date bordshockey.net uses for the event.
+  `Country`/`City`: Czech Republic / Liberec (the pages link wch-liberec2017.eu).
+- **Group stage only:** basic and final groups are kept; play-off games (413) are left out, as asked
+  (bordshockey.net, which the H2H site ingests, already has the 2017 play-offs of Open, Women, Juniors and Veterans).
+- **Ids:** every player but one has an ITHF id (participants list / WR order); Rocco Milovanovič (50+) has only a
+  Trefik idpl. Sportscorpion does not list the event.
+- **Missing captures:** `50_ranking/_wr/_inter/_off/_def` and `u13_cross_1/_ranking/_wr/_inter/_off/_def`
+  (statistics and duplicate views; the games are on the captured group and play-off pages) and team match pages.
+  Result: 4,387 group games (Open 2,881, Women 187, Juniors 306, Veterans 546, 50+ 277, U13 190).
+
+**Fix to existing data (Czech championships 2019–2025):** their cross-tables have the same nation column, and the
+parser used to read it as the first game column, so every cell was shifted one player to the left. 40 group
+tables were affected; rebuilding `trefik_results.parquet` from the committed raw pages corrected 2,518 games
+(wrong opponent or score), added 632 and removed 175 (games now paired correctly). galdahokejs.lv's Amatieru Līga
+2024/2025 pages also have the column: 81 games were added there, none changed. A cross-table diagonal check over all
+saved pages finds no misaligned group table left.
 
 ## Known gaps
 
