@@ -22,12 +22,15 @@ from .common.dedupe import check_and_report
 from .common.schema import COLUMNS, to_frame, write_parquet
 
 ORDER = ["trefik", "galdahokejs", "escore", "finland"]
+# one-off backfills: their committed Parquet goes into all_results.parquet, but they are never crawled here
+BACKFILLS = ["ithf_archive"]
+COMBINED = ORDER + BACKFILLS
 log = logging.getLogger("scrapers.all")
 
 
 def combine(data_dir) -> pd.DataFrame:
     frames = []
-    for name in ORDER:
+    for name in COMBINED:
         path = data_dir / f"{name}_results.parquet"
         if path.exists():
             frames.append(pd.read_parquet(path))
@@ -56,7 +59,7 @@ def main() -> int:
     df = combine(ctx.data_dir)
     write_parquet(df, ctx.data_dir / "all_results.parquet")
     check_and_report(df, ctx.data_dir / "duplicate_check.csv")
-    id_report.write(ctx.data_dir, ORDER, ctx.ref)
+    id_report.write(ctx.data_dir, COMBINED, ctx.ref)
     if failed:
         print(f"\nFailed sources: {', '.join(failed)}")
         return 1

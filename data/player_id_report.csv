@@ -1,13 +1,16 @@
 name,n_ids,ids,details
-Honza Sládek,2,1310 2009,"1310 (sportscorpion, in players_data.csv, Czech Republic; as Sladek Honza) | 2009 (sportscorpion; trefik 3658; as Honza Sládek / Sládek Honza)"
-Kraus Vojtěch,2,13909 16432,"13909 (sportscorpion; galdahokejs 12, trefik 1916; as Kraus Vojtěch / Vojtech Kraus / Vojtěch Kraus) | 16432 (sportscorpion, in players_data.csv, Czech Republic; as Vojtech Kraus)"
-Hudec Karol,3,1240 4137 9260046,"1240 (sportscorpion, in players_data.csv, Slovakia; as Hudec Karol) | 4137 (sportscorpion, in players_data.csv, Slovakia; as Hudec Karol) | 9260046 (ithf_synthetic; trefik 1823; as Karol Hudec)"
-Blasko Imrich,3,1233 15494 9260161,"1233 (sportscorpion, in players_data.csv, Slovakia; as Blasko Imrich) | 15494 (sportscorpion, in players_data.csv, Slovakia; as Imrich Blaško) | 9260161 (ithf_synthetic; trefik 1185; as Imrich Blaško)"
-Edgars Liepins,3,15217 15529 9676383,"15217 (sportscorpion, in players_data.csv, Latvia; as Edgars Liepiņš) | 15529 (sportscorpion, in players_data.csv, Latvia; as Edgars Liepins) | 9676383 (ithf_synthetic; escore 168, galdahokejs 173, trefik 33; as Edgars Liepins / Edgars Liepiņš)"
-Krejzlík Štěpán,2,21000116 21000175,21000116 (local; trefik 137; as Štěpán Krejzlík) | 21000175 (local; trefik 47; as Krejzlík Štěpán)
+Honza Sládek,2,1310 2009,"1310 (sportscorpion, in players_data.csv, Czech Republic; as Sladek Honza) | 2009 (sportscorpion; ithf_archive 17, trefik 3661; as Honza Sládek / Sládek Honza)"
+Kraus Vojtěch,2,13909 16432,"13909 (sportscorpion; galdahokejs 12, trefik 1945; as Kraus Vojtěch / Vojtech Kraus / Vojtěch Kraus) | 16432 (sportscorpion, in players_data.csv, Czech Republic; as Vojtech Kraus)"
+Hudec Karol,3,1240 4137 9260046,"1240 (sportscorpion, in players_data.csv, Slovakia; as Hudec Karol) | 4137 (sportscorpion, in players_data.csv, Slovakia; as Hudec Karol) | 9260046 (ithf_synthetic; ithf_archive 65, trefik 1823; as Karol Hudec)"
+Blasko Imrich,3,1233 15494 9260161,"1233 (sportscorpion, in players_data.csv, Slovakia; as Blasko Imrich) | 15494 (sportscorpion, in players_data.csv, Slovakia; as Imrich Blaško) | 9260161 (ithf_synthetic; ithf_archive 18, trefik 1185; as Imrich Blaško)"
+Martin Vépy I,2,14352 21000157,14352 (sportscorpion; ithf_archive 40; as Martin Vépy I) | 21000157 (local; trefik 683; as Martin Vépy I)
+Edgars Liepins,3,15217 15529 9676383,"15217 (sportscorpion, in players_data.csv, Latvia; as Edgars Liepiņš) | 15529 (sportscorpion, in players_data.csv, Latvia; as Edgars Liepins) | 9676383 (ithf_synthetic; escore 168, galdahokejs 174, trefik 33; as Edgars Liepins / Edgars Liepiņš)"
+Krejzlík Štěpán,2,21000116 21000175,21000116 (local; trefik 137; as Štěpán Krejzlík) | 21000175 (local; trefik 53; as Krejzlík Štěpán)
 Mykhailo Razkevich,2,14560 50000106,14560 (sportscorpion; trefik 112; as Mykhailo Razkevich) | 50000106 (local; galdahokejs 63; as Mykhailo Razkevich)
-Kraus Václav,2,21000122 21000180,21000122 (local; trefik 85; as Václav Kraus) | 21000180 (local; trefik 8; as Kraus Václav)
+Yuri Artamonov,2,4754 21000233,4754 (sportscorpion; ithf_archive 39; as Yuri Artamonov) | 21000233 (local; trefik 110; as Yuri Artamonov)
+Kraus Václav,2,21000122 21000180,21000122 (local; trefik 85; as Václav Kraus) | 21000180 (local; trefik 10; as Kraus Václav)
 Dmytro Kudrytsky,3,465 1933 9310043,"465 (sportscorpion, in players_data.csv, Ukraine; as Dmytro Kudrytsky) | 1933 (sportscorpion, in players_data.csv, Ukraine; as Dmytro Kudrytsky) | 9310043 (ithf_synthetic; galdahokejs 38, trefik 45; as Dmytro Kudrytsky)"
+Dmytro Litvinyuk,2,1484 1560,"1484 (sportscorpion; ithf_archive 58; as Dmytro Litvinyuk) | 1560 (sportscorpion, in players_data.csv, Ukraine; as Litvinyuk Dmytro)"
 Petr Vlach,2,21000196 21000990,21000196 (local; trefik 48; as Petr Vlach) | 21000990 (local; trefik 10; as Vlach Petr)
 Igor Kashentsev,3,238 1567 9240132,"238 (sportscorpion, in players_data.csv, Russia; as Kashentsev Igor) | 1567 (sportscorpion, in players_data.csv, Russia; as Kashentsev Igor) | 9240132 (ithf_synthetic; trefik 43; as Igor Kashentsev)"
 Artem Valiev,2,711 21000370,"711 (sportscorpion, in players_data.csv, Republic of Lithuania; as Artem Valiev) | 21000370 (local; trefik 40; as Artem Valiev)"
